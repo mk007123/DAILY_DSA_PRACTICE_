@@ -1,0 +1,38 @@
+class Solution {
+public:
+    int search(vector<int>& arr, int target) {
+        int n = arr.size();  // Store the size of the array
+
+        int start = 0;       // Starting index of the array
+        int end = n - 1;     // Ending index of the array
+
+        // Continue searching while the search range is valid
+        while (start <= end) {
+
+            // Find the middle index of the current search range
+            int mid = (start + end) / 2;
+
+            int ele = arr[mid];  // Get the middle element
+
+            // If the middle element matches the target, return its index
+            if (ele == target) {
+                return mid;
+            }
+
+            // If the middle element is smaller than the target,
+            // search in the right half of the array
+            else if (ele < target) {
+                start = mid + 1;
+            }
+
+            // If the middle element is greater than the target,
+            // search in the left half of the array
+            else {
+                end = mid - 1;
+            }
+        }
+
+        // If the target is not found, return -1
+        return -1;
+    }
+};
