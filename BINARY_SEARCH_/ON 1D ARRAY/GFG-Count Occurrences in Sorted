@@ -1,0 +1,105 @@
+class Solution {
+  public:
+
+  // Function to find the first occurrence of target
+  int f1(vector<int>& arr, int target) {
+      int n = arr.size();  // Store the size of the array
+
+      int ans = -1;        // Store the first occurrence index
+                           // -1 means target is not found
+
+      int start = 0;       // Starting index of the search range
+      int end = n - 1;     // Ending index of the search range
+
+      // Continue searching while the search range is valid
+      while (start <= end) {
+
+          // Find the middle index of the current search range
+          int mid = (start + end) / 2;
+
+          int ele = arr[mid];  // Get the middle element
+
+          // If the middle element is smaller than target,
+          // search in the right half
+          if (ele < target) {
+              start = mid + 1;
+          }
+
+          // If target is found, store its index
+          // and search the left half for an earlier occurrence
+          else if (ele == target) {
+              ans = mid;
+              end = mid - 1;
+          }
+
+          // If the middle element is greater than target,
+          // search in the left half
+          else {
+              end = mid - 1;
+          }
+      }
+
+      // Return the first occurrence index, or -1 if not found
+      return ans;
+  }
+
+  // Function to find the last occurrence of target
+  int f2(vector<int>& arr, int target) {
+      int n = arr.size();  // Store the size of the array
+
+      int ans = -1;        // Store the last occurrence index
+                           // -1 means target is not found
+
+      int start = 0;       // Starting index of the search range
+      int end = n - 1;     // Ending index of the search range
+
+      // Continue searching while the search range is valid
+      while (start <= end) {
+
+          // Find the middle index of the current search range
+          int mid = (start + end) / 2;
+
+          int ele = arr[mid];  // Get the middle element
+
+          // If the middle element is smaller than target,
+          // search in the right half
+          if (ele < target) {
+              start = mid + 1;
+          }
+
+          // If target is found, store its index
+          // and search the right half for a later occurrence
+          else if (ele == target) {
+              ans = mid;
+              start = mid + 1;
+          }
+
+          // If the middle element is greater than target,
+          // search in the left half
+          else {
+              end = mid - 1;
+          }
+      }
+
+      // Return the last occurrence index, or -1 if not found
+      return ans;
+  }
+
+  // Function to count how many times target appears
+  int countFreq(vector<int>& arr, int target) {
+
+      // Find the first occurrence of target
+      int first_occ = f1(arr, target);
+
+      // If target does not exist, its frequency is 0
+      if (first_occ == -1) {
+          return 0;
+      }
+
+      // Find the last occurrence of target
+      int last_occ = f2(arr, target);
+
+      // Frequency = last index - first index + 1
+      return last_occ - first_occ + 1;
+  }
+};
