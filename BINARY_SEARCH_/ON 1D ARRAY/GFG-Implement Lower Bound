@@ -1,0 +1,38 @@
+class Solution {
+  public:
+    int lowerBound(vector<int>& arr, int target) {
+        int n = arr.size();  // Store the size of the array
+
+        int start = 0;       // Starting index of the search range
+        int end = n - 1;     // Ending index of the search range
+
+        int ans = n;         // If no element is >= target, return n
+
+        // Continue searching while the search range is valid
+        while (start <= end) {
+
+            // Find the middle index of the current search range
+            int mid = (start + end) / 2;
+
+            int ele = arr[mid];  // Get the middle element
+
+            // If the middle element is smaller than target,
+            // it cannot be the lower bound, so search the right half
+            if (ele < target) {
+                start = mid + 1;
+            }
+
+            // If the middle element is >= target,
+            // it could be our answer, so store its index
+            // and search the left half for an earlier valid index
+            else {
+                ans = mid;
+                end = mid - 1;
+            }
+        }
+
+        // Return the first index where arr[index] >= target,
+        // or n if no such element exists
+        return ans;
+    }
+};
