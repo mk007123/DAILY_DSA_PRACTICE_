@@ -1,0 +1,67 @@
+class Solution {
+public:
+    bool search(vector<int>& arr, int target) {
+        int n = arr.size();  // Store the size of the array
+
+        int start = 0;       // Starting index of the search range
+        int end = n - 1;     // Ending index of the search range
+
+        // Continue searching while the search range is valid
+        while (start <= end) {
+
+            int s1 = arr[start];  // First element of the current search range
+            int e2 = arr[end];    // Last element of the current search range
+
+            // Find the middle index of the current search range
+            int mid = (start + end) / 2;
+
+            int ele = arr[mid];   // Get the middle element
+
+            // If the middle element matches the target, return true
+            if (ele == target) {
+                return true;
+            }
+
+            // If the first, middle, and last elements are equal,
+            // we cannot determine which half is sorted.
+            // So, shrink the search range from both ends.
+            else if (s1 == e2 && e2 == arr[mid]) {
+                start++;
+                end--;
+            }
+
+            // Check whether the left half is sorted
+            else if (arr[mid] >= s1) {
+
+                // If the target lies between the first and middle
+                // elements, search in the left half
+                if (target >= s1 && target <= arr[mid]) {
+                    end = mid - 1;
+                }
+
+                // Otherwise, search in the right half
+                else {
+                    start = mid + 1;
+                }
+            }
+
+            // Otherwise, the right half is sorted
+            else {
+
+                // If the target lies between the middle and last
+                // elements, search in the right half
+                if (target >= arr[mid] && target <= e2) {
+                    start = mid + 1;
+                }
+
+                // Otherwise, search in the left half
+                else {
+                    end = mid - 1;
+                }
+            }
+        }
+
+        // Return false if the target is not found
+        return false;
+    }
+};
