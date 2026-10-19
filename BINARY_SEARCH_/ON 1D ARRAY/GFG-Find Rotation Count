@@ -1,0 +1,45 @@
+class Solution {
+  public:
+    int findKRotation(vector<int> &arr) {
+       int n = arr.size();   // Store the size of the array
+
+       int start = 0;        // Starting index of the search range
+       int end = n - 1;      // Ending index of the search range
+
+       int mini_ele = arr[0];   // Store the minimum element found so far
+       int mini_index = 0;      // Store the index of the minimum element
+
+       int s1 = arr[0];      // Store the first element of the array
+       int e2 = arr[n - 1];  // Store the last element of the array
+
+       // Continue searching while the search range is valid
+       while (start <= end) {
+
+            // Find the middle index of the current search range
+            int mid = (start + end) / 2;
+
+            int ele = arr[mid];  // Get the middle element
+
+            // If the middle element is >= the first element,
+            // it belongs to the left sorted portion.
+            // The minimum may be in the right half.
+            if (arr[mid] >= s1) {
+                start = mid + 1;
+            }
+
+            // Otherwise, the middle element belongs to the
+            // rotated right portion and may be the minimum.
+            else {
+                mini_ele = arr[mid];  // Update the minimum element
+                mini_index = mid;     // Store its index
+
+                // Search the left half for an even smaller element
+                end = mid - 1;
+            }
+        }
+
+        // Return the index of the minimum element,
+        // which represents the number of rotations
+        return mini_index;
+    }
+};
