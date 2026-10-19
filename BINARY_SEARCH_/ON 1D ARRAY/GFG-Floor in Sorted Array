@@ -1,0 +1,38 @@
+class Solution {
+  public:
+    int findFloor(vector<int>& arr, int x) {
+       int n = arr.size();  // Store the size of the array
+
+       int start = 0;       // Starting index of the search range
+       int end = n - 1;     // Ending index of the search range
+
+       int ans = -1;        // Default answer: -1 if no element <= x exists
+
+       // Continue searching while the search range is valid
+       while (start <= end) {
+
+           // Find the middle index of the current search range
+           int mid = (start + end) / 2;
+
+           int ele = arr[mid];  // Get the middle element
+
+           // If the middle element is <= x, it is a possible answer
+           if (ele <= x) {
+               ans = mid;       // Store its index as the current answer
+
+               // Search the right half for a larger valid element
+               start = mid + 1;
+           }
+
+           // If the middle element is > x,
+           // search the left half for a smaller element
+           else {
+               end = mid - 1;
+           }
+       }
+
+       // Return the index of the largest element <= x,
+       // or -1 if no such element exists
+       return ans;
+    }
+};
