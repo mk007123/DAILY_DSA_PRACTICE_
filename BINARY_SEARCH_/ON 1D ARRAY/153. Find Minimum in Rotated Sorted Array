@@ -1,0 +1,42 @@
+class Solution {
+public:
+    int findMin(vector<int>& arr) {
+        int n = arr.size();  // Store the size of the array
+
+        int start = 0;       // Starting index of the search range
+        int end = n - 1;     // Ending index of the search range
+
+        int s1 = arr[0];     // Store the first element of the array
+        int e2 = arr[n - 1]; // Store the last element of the array
+
+        int ans = arr[0];    // Initialize the minimum element as the first element
+
+        // Continue searching while the search range is valid
+        while (start <= end) {
+
+            // Find the middle index of the current search range
+            int mid = (start + end) / 2;
+
+            int ele = arr[mid];  // Get the middle element
+
+            // If the middle element is >= the first element,
+            // it belongs to the left sorted portion.
+            // The minimum may be in the right half.
+            if (arr[mid] >= s1) {
+                start = mid + 1;
+            }
+
+            // Otherwise, the middle element belongs to the right
+            // sorted portion and may be the minimum.
+            else {
+                ans = arr[mid];  // Store it as a possible minimum
+
+                // Search the left half for a smaller element
+                end = mid - 1;
+            }
+        }
+
+        // Return the minimum element found
+        return ans;
+    }
+};
