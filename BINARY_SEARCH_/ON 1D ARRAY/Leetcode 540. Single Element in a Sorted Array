@@ -1,0 +1,83 @@
+class Solution {
+public:
+    int singleNonDuplicate(vector<int>& arr) {
+        int n = arr.size();
+
+        // If the array contains only one element,
+        // that element is the single non-duplicate element
+        if (n == 1) {
+            return arr[0];
+        }
+
+        // If the first element is different from the second,
+        // the first element is the single element
+        if (arr[0] != arr[1]) {
+            return arr[0];
+        }
+
+        // If the last element is different from the second-last,
+        // the last element is the single element
+        if (arr[n - 1] != arr[n - 2]) {
+            return arr[n - 1];
+        }
+
+        // Ignore the first and last elements because
+        // we have already checked them
+        int start = 1;
+        int end = n - 2;
+
+        // Continue searching while the search range is valid
+        while (start <= end) {
+
+            // Find the middle index of the current search range
+            int mid = (start + end) / 2;
+
+            int ele = arr[mid];       // Middle element
+            int left = arr[mid - 1];  // Element immediately to the left
+            int right = arr[mid + 1]; // Element immediately to the right
+
+            // If the middle element differs from both neighbours,
+            // it is the single non-duplicate element
+            if (ele != left && ele != right) {
+                return ele;
+            }
+
+            // If the middle element matches its left neighbour,
+            // the pair is (mid - 1, mid)
+            if (ele == left) {
+
+                // If mid is odd, the pair is in the expected positions.
+                // The single element must be on the right.
+                if (mid % 2 == 1) {
+                    start = mid + 1;
+                }
+
+                // Otherwise, the pair is misaligned,
+                // so the single element must be on the left
+                else {
+                    end = mid - 1;
+                }
+            }
+
+            // Otherwise, the middle element matches its right neighbour,
+            // so the pair is (mid, mid + 1)
+            else {
+
+                // If mid is even, the pair is in the expected positions.
+                // The single element must be on the right.
+                if (mid % 2 == 0) {
+                    start = mid + 1;
+                }
+
+                // Otherwise, the pair is misaligned,
+                // so the single element must be on the left
+                else {
+                    end = mid - 1;
+                }
+            }
+        }
+
+        // Return -1 if no single element is found
+        return -1;
+    }
+};
