@@ -1,0 +1,38 @@
+class Solution {
+  public:
+    int findCeil(vector<int>& arr, int x) {
+        int n = arr.size();  // Store the size of the array
+
+        int ans = -1;        // Default answer: -1 if no element >= x exists
+
+        int start = 0;       // Starting index of the search range
+        int end = n - 1;     // Ending index of the search range
+
+        // Continue searching while the search range is valid
+        while (start <= end) {
+
+            // Find the middle index of the current search range
+            int mid = (start + end) / 2;
+
+            int ele = arr[mid];  // Get the middle element
+
+            // If the middle element is smaller than x,
+            // it cannot be the ceil, so search the right half
+            if (ele < x) {
+                start = mid + 1;
+            }
+
+            // If the middle element is >= x, it is a possible answer
+            else {
+                ans = mid;       // Store its index as the current answer
+
+                // Search the left half for an earlier valid index
+                end = mid - 1;
+            }
+        }
+
+        // Return the index of the smallest element >= x,
+        // or -1 if no such element exists
+        return ans;
+    }
+};
