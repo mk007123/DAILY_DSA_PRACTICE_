@@ -1,0 +1,44 @@
+class Solution {
+public:
+    int searchInsert(vector<int>& arr, int target) {
+        int n = arr.size();  // Store the size of the array
+
+        int start = 0;       // Starting index of the search range
+        int end = n - 1;     // Ending index of the search range
+
+        int ans = n;         // Default answer: insert at the end if target
+                             // is greater than all elements
+
+        // Continue searching while the search range is valid
+        while (start <= end) {
+
+            // Find the middle index of the current search range
+            int mid = (start + end) / 2;
+
+            int ele = arr[mid];  // Get the middle element
+
+            // If the middle element is smaller than target,
+            // search in the right half
+            if (ele < target) {
+                start = mid + 1;
+            }
+
+            // If the target is found, return its index immediately
+            else if (ele == target) {
+                return mid;
+            }
+
+            // If the middle element is greater than target,
+            // store its index as a possible insertion position
+            // and search the left half for an earlier position
+            else {
+                ans = mid;
+                end = mid - 1;
+            }
+        }
+
+        // Return the index where target should be inserted
+        // to maintain the sorted order
+        return ans;
+    }
+};
