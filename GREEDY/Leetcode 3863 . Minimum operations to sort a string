@@ -1,0 +1,127 @@
+class Solution {
+public:
+    int minOperations(string str) {
+        // Store the length of the input string.
+        // We use n to check the string's length and access its characters.
+        int n = str.size();
+
+        // Find the smallest character in the entire string.
+        // min_element() returns an iterator pointing to the first
+        // occurrence of the smallest character.
+        // The * operator retrieves the character at that iterator.
+        char mini = *min_element(str.begin(), str.end());
+
+        // Find the largest character in the entire string.
+        // max_element() returns an iterator pointing to the first
+        // occurrence of the largest character.
+        char maxi = *max_element(str.begin(), str.end());
+
+        // Initialize c to 1 because the first character itself
+        // forms a non-decreasing sequence of length 1.
+        // We will check whether subsequent characters maintain
+        // the non-decreasing order.
+        int c = 1;
+
+        // Start from index 1 because we compare each character
+        // with the character immediately before it, at index i - 1.
+        for (int i = 1; i < n; i++) {
+
+            // Check whether the current character is greater than
+            // or equal to the previous character.
+            //
+            // If this condition is true, the non-decreasing sequence
+            // continues, so increment c.
+            //
+            // Example: For "abcd", the comparisons are:
+            // 'b' >= 'a', 'c' >= 'b', and 'd' >= 'c'.
+            // All comparisons are true, so c becomes equal to n.
+            if (str[i] >= str[i - 1]) {
+                c++;
+            }
+            else {
+                // If the current character is smaller than the previous
+                // character, the non-decreasing sequence is broken.
+                //
+                // Stop checking because the entire string cannot be
+                // non-decreasing once a decreasing pair is encountered.
+                break;
+            }
+        }
+
+        // If c equals n, every character belongs to the initial
+        // non-decreasing sequence.
+        //
+        // Therefore, the entire string is already sorted in
+        // non-decreasing order, and the code returns 0.
+        //
+        // Example: "abcd" -> c = 4, n = 4 -> return 0.
+        if (c == n) {
+            return 0;
+        }
+
+        // If the string has exactly two characters and the previous
+        // condition did not return 0, the string is not sorted.
+        //
+        // According to the logic assumed by this solution,
+        // this case is considered impossible, so return -1.
+        //
+        // Example: "ba" -> the string is not sorted and n = 2.
+        if (n == 2) {
+            return -1;
+        }
+
+        // Check whether the smallest character is already at the
+        // first position OR the largest character is already at
+        // the last position.
+        //
+        // str[0] represents the first character.
+        // str[n - 1] represents the last character.
+        //
+        // If either condition is true, this solution returns 1.
+        //
+        // The idea is that having either extreme character at its
+        // corresponding boundary may make the required arrangement
+        // possible in one operation, depending on the problem's rules.
+        if (str[0] == mini || str[n - 1] == maxi) {
+            return 1;
+        }
+
+        // If neither boundary condition is satisfied, examine
+        // the internal characters of the string.
+        //
+        // Start at index 1 to exclude the first character.
+        // Stop before index n - 1 to exclude the last character.
+        //
+        // Therefore, this loop checks indices 1 through n - 2.
+        for (int i = 1; i < n - 1; i++) {
+
+            // Check whether the current internal character is either
+            // the smallest character or the largest character.
+            //
+            // If the smallest or largest character occurs internally,
+            // the code returns 2.
+            //
+            // The intended idea is that an extreme character located
+            // inside the string may require two operations rather
+            // than one, depending on the allowed operation.
+            if (str[i] == mini || str[i] == maxi) {
+                return 2;
+            }
+        }
+
+        // If execution reaches this point:
+        // 1. The string is not already sorted.
+        // 2. The string does not have exactly two characters.
+        // 3. The smallest character is not at the first position.
+        // 4. The largest character is not at the last position.
+        // 5. Neither the smallest nor the largest character occurs
+        //    at any internal position.
+        //
+        // Therefore, according to this solution's decision logic,
+        // return 3.
+        //
+        // IMPORTANT: The correctness of returning 1, 2, or 3 depends
+        // on the original problem's definition of an operation.
+        return 3;
+    }
+};
