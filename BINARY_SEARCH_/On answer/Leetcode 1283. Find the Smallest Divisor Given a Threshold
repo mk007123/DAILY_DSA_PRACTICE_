@@ -1,0 +1,178 @@
+
+/*
+PROBLEM: SMALLEST DIVISOR GIVEN A THRESHOLD
+===========================================
+
+APPROACH: BINARY SEARCH ON THE ANSWER
+
+PROBLEM UNDERSTANDING:
+We are given an array of positive integers 'arr' and an integer
+threshold 'th'. We need to find the smallest positive divisor 'div'
+such that the sum of the ceiling divisions of all array elements
+is less than or equal to 'th'.
+
+Mathematically, we need to find the smallest divisor satisfying:
+
+    ceil(arr[0] / div) + ceil(arr[1] / div) + ...
+    + ceil(arr[n-1] / div) <= th
+
+CEILING DIVISION:
+Ceiling division means rounding the result UP to the nearest integer.
+For example, ceil(7 / 3) = 3, ceil(8 / 4) = 2, and ceil(9 / 4) = 3.
+
+In C++, integer division discards the fractional part, so 7 / 3
+gives 2 instead of 3. To calculate ceiling division, we add ele / div
+to the sum and check the remainder using ele % div. If the remainder
+is non-zero, we add 1; otherwise, the quotient is already the exact
+result. For example, 7 / 3 gives quotient 2 and remainder 1, so the
+ceiling result is 3.
+
+HELPER FUNCTION f():
+The helper function checks whether a given divisor is valid. It
+traverses the array, calculates the ceiling division of each element,
+and adds the results to a running sum.
+
+If the sum exceeds 'th', it immediately returns false. This early
+termination is safe because every element contributes at least 1,
+so processing more elements cannot decrease the sum.
+
+If all elements are processed and the sum remains <= th, the divisor
+is valid, and the function returns true. We use long long for the sum
+to reduce the risk of integer overflow.
+
+CHECKING WHETHER A SOLUTION EXISTS:
+Every positive array element contributes at least 1 to the sum for
+any positive divisor. Therefore, if the array contains n elements,
+the minimum possible sum is n.
+
+If n > th, even the minimum possible sum exceeds the threshold, so
+no valid divisor exists and we return -1. Otherwise, a valid divisor
+is guaranteed to exist for a non-empty array of positive integers.
+
+SEARCH SPACE:
+We initialize start = 1 because the divisor must be positive.
+We initialize end = max(arr) because when the divisor equals the
+maximum array element, every ceiling division equals 1.
+
+The total sum becomes n, which is <= th because of our earlier
+feasibility check. Therefore, the answer must lie in the range
+[1, max(arr)].
+
+WHY BINARY SEARCH WORKS:
+As the divisor increases, the ceiling-division result of each
+positive element can only decrease or remain the same. Consequently,
+the total sum can never increase.
+
+This creates a monotonic pattern: smaller divisors may be invalid,
+while larger divisors eventually become valid. Once a divisor is
+valid, every larger divisor is also valid. Once a divisor is invalid,
+every smaller divisor is also invalid.
+
+We can use binary search to find the FIRST valid divisor instead
+of checking every possible divisor.
+
+BINARY SEARCH LOGIC:
+While start <= end, calculate:
+
+    mid = start + (end - start) / 2
+
+This expression finds the middle of the search range while reducing
+the risk of integer overflow compared with (start + end) / 2.
+
+Call f(arr, mid, th) to check whether mid is valid.
+
+If mid is valid, store it in ans because it is a possible answer.
+However, it may not be the smallest valid divisor, so search the
+left half by setting end = mid - 1.
+
+If mid is invalid, every smaller divisor is also invalid, so search
+the right half by setting start = mid + 1.
+
+Repeat until start > end. Since every valid candidate is saved and
+we continue searching left, ans contains the smallest valid divisor.
+
+EXAMPLE:
+Consider arr = {1, 2, 5, 9} and th = 6.
+
+For divisor 3, the ceiling results are {1, 1, 2, 3}, whose sum is 7,
+so it is invalid.
+
+For divisor 4, the results are also {1, 1, 2, 3}, with sum 7,
+so it is invalid.
+
+For divisor 5, the results are {1, 1, 1, 2}, with sum 5, so it is
+valid. Divisors 1 through 4 are invalid, while divisor 5 is valid.
+Therefore, the smallest valid divisor is 5.
+
+COMPLEXITY ANALYSIS:
+Let n be the number of array elements and M be the maximum element.
+
+Time Complexity: O(n * log M)
+Each helper-function call takes O(n) time in the worst case, and
+binary search takes O(log M) iterations.
+
+Auxiliary Space Complexity: O(1)
+We use only a constant number of additional variables and do not
+create another data structure.
+*/
+
+
+// ORIGINAL CODE WITH SHORT COMMENTS
+
+#include <bits/stdc++.h>
+using namespace std;
+
+class Solution {
+public:
+    // Check whether the divisor produces a sum <= th.
+    bool f(vector<int>& arr, int div, int th) {
+        int n = arr.size();
+        long long sum = 0;
+
+        for (int i = 0; i < n; i++) {
+            long long ele = arr[i];
+
+            sum += ele / div;
+
+            // Add 1 if the division has a remainder.
+            int rem = ele % div;
+            if (rem) {
+                sum++;
+            }
+
+            // Stop early if the threshold is exceeded.
+            if (sum > th) {
+                return false;
+            }
+        }
+
+        return sum <= th;
+    }
+
+    // Find the smallest valid divisor using binary search.
+    int smallestDivisor(vector<int>& arr, int th) {
+        int n = arr.size();
+
+        // Minimum possible sum is n.
+        if (n > th) {
+            return -1;
+        }
+
+        int start = 1;
+        int end = *max_element(arr.begin(), arr.end());
+        int ans = 0;
+
+        while (start <= end) {
+            int mid = start + (end - start) / 2;
+
+            if (f(arr, mid, th)) {
+                ans = mid;       // Valid: save and search left.
+                end = mid - 1;
+            } else {
+                start = mid + 1; // Invalid: search right.
+            }
+        }
+
+        return ans;
+    }
+};
