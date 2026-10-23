@@ -1,0 +1,144 @@
+
+/*
+PROBLEM: KOKO EATING BANANAS
+============================
+
+APPROACH: BINARY SEARCH ON THE ANSWER
+
+PROBLEM UNDERSTANDING:
+We are given an array 'arr', where each element represents the number
+of bananas in a pile, and an integer 'max_hours', which is the maximum
+time available to eat all the bananas.
+
+We need to find the minimum eating speed, in bananas per hour, that
+allows us to finish all the piles within max_hours.
+
+Koko eats at a fixed speed. If a pile contains fewer bananas than
+the eating speed, she still needs one full hour to finish that pile.
+She cannot split an hour between two different piles.
+
+CALCULATING THE HOURS:
+For each pile, we calculate the hours needed using ceiling division:
+
+    hours = ceil(arr[i] / speed)
+
+We can calculate this without floating-point arithmetic by dividing
+the pile size by speed and adding 1 if there is a remainder.
+
+For example, if a pile has 10 bananas and speed is 3, the hours
+needed are 4 because 10 / 3 = 3 with a remainder of 1.
+
+If a pile has 9 bananas and speed is 3, the hours needed are 3
+because the division is exact.
+
+HELPER FUNCTION f():
+The helper function checks whether a given eating speed can finish
+all the piles within max_hours. It calculates the hours needed for
+each pile and adds them to total_hours.
+
+If total_hours exceeds max_hours at any point, we return false
+immediately. There is no need to check the remaining piles because
+the total hours cannot decrease.
+
+If all piles are processed and the total hours are within the limit,
+the function returns true, meaning the speed is sufficient.
+
+WHY BINARY SEARCH WORKS:
+A higher eating speed requires fewer or equal hours to finish the
+piles. A lower speed requires more or equal hours.
+
+Therefore, if a speed is sufficient, every higher speed is also
+sufficient. If a speed is too slow, every lower speed is also too
+slow.
+
+This pattern allows us to use binary search to find the minimum
+speed that works.
+
+SEARCH RANGE:
+The minimum speed is 1 because Koko must eat at least one banana
+per hour.
+
+We set the upper limit to the sum of all bananas. At this speed,
+Koko can finish each pile in one hour, so the total time needed is
+the number of piles.
+
+This upper limit is guaranteed to work when max_hours is at least
+the number of piles, as required by the problem.
+
+BINARY SEARCH:
+We calculate mid as the eating speed to test and call f() to check
+whether it is sufficient.
+
+If mid is sufficient, we save it in ans and search the left half
+for a smaller speed by setting end = mid - 1.
+
+If mid is insufficient, we need a higher speed, so we set
+start = mid + 1.
+
+We repeat until start > end. The smallest sufficient speed is
+stored in ans and returned.
+
+COMPLEXITY:
+Let n be the number of piles and S be the sum of all bananas.
+
+Time Complexity: O(n * log S), because each check takes O(n) time
+and binary search takes O(log S) iterations.
+
+Auxiliary Space Complexity: O(1), because we use only a fixed
+number of extra variables.
+*/
+
+
+// ORIGINAL CODE WITH SHORT COMMENTS
+
+class Solution {
+public:
+    // Check whether the given speed finishes all piles in time.
+    bool f(vector<int>& arr, int max_hours, int speed) {
+        int n = arr.size();
+        long long total_hours = 0;
+
+        for (int i = 0; i < n; i++) {
+            long long ele = arr[i];
+
+            total_hours += (ele / speed);
+
+            // Add one hour if the division has a remainder.
+            if (ele % speed) {
+                total_hours++;
+            }
+
+            // Stop if the allowed time is exceeded.
+            if (total_hours > max_hours) {
+                return false;
+            }
+        }
+
+        return total_hours <= max_hours;
+    }
+
+    // Find the minimum eating speed using binary search.
+    int minEatingSpeed(vector<int>& arr, int max_hours) {
+        int n = arr.size();
+
+        long long start = 1;
+        long long end = accumulate(arr.begin(), arr.end(), 0LL);
+        long long ans = 1e18;
+
+        while (start <= end) {
+            long long mid = start + (end - start) / 2;
+
+            bool flag = f(arr, max_hours, mid);
+
+            if (flag) {
+                ans = mid;       // Valid speed: try a smaller one.
+                end = mid - 1;
+            } else {
+                start = mid + 1; // Too slow: increase the speed.
+            }
+        }
+
+        return ans;
+    }
+};
+875. Koko Eating Bananas
