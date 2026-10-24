@@ -1,0 +1,152 @@
+
+/*
+PROBLEM: MINIMUM NUMBER OF DAYS TO MAKE M BOUQUETS
+==================================================
+
+APPROACH: BINARY SEARCH ON THE ANSWER
+
+PROBLEM UNDERSTANDING:
+We are given an array 'arr', where arr[i] represents the day on
+which the i-th flower blooms. We are also given two integers, m
+and k. We need to make m bouquets, and each bouquet requires k
+adjacent flowers.
+
+A flower can be used only after it has bloomed. We need to find
+the minimum number of days required to make all m bouquets.
+Each flower can be used in only one bouquet.
+
+CHECKING WHETHER A SOLUTION IS POSSIBLE:
+The minimum number of flowers needed is m * k. If m * k is greater
+than the total number of flowers, making all the bouquets is
+impossible, so we return -1.
+
+We use 1LL * m * k to perform the multiplication as long long,
+which helps prevent integer overflow.
+
+HELPER FUNCTION f():
+The helper function checks whether we can make m bouquets by a
+given day. It goes through the array and checks which flowers
+have bloomed by that day.
+
+We use k to count how many more adjacent flowers are needed for
+the current bouquet. The variable temp stores the original value
+of k so that we can reset the counter after making a bouquet.
+
+If arr[i] <= day, the flower has bloomed, so we decrease k.
+When k becomes zero, we have found k consecutive bloomed flowers
+and can make one bouquet. We decrease m and reset k to temp for
+the next bouquet.
+
+If m becomes zero, all required bouquets have been made, so we
+return true immediately.
+
+If a flower has not bloomed by the given day, we reset k to temp.
+This is necessary because flowers on opposite sides of an
+unbloomed flower cannot belong to the same bouquet.
+
+If we finish checking the array without making all m bouquets,
+the function returns false.
+
+SEARCH SPACE:
+The earliest possible day is 1, so start = 1. The latest required
+blooming day is max(arr), because by that day all flowers have
+bloomed. Therefore, the answer lies between 1 and max(arr).
+
+WHY BINARY SEARCH WORKS:
+If we can make all bouquets by a particular day, we can also make
+them on any later day because flowers that have bloomed remain
+available. If we cannot make them by a particular day, we cannot
+make them on any earlier day.
+
+This creates a monotonic pattern: earlier days may be invalid,
+while later days eventually become valid. We use binary search
+to find the first day on which making all bouquets is possible.
+
+BINARY SEARCH LOGIC:
+We calculate mid and call f(arr, mid, m, k).
+
+If the helper function returns true, mid is a possible answer.
+We store it in ans and search the left half using end = mid - 1
+to find an earlier valid day.
+
+If the helper function returns false, we need more time for the
+flowers to bloom, so we search the right half using start = mid + 1.
+
+We repeat until start > end and return ans, which stores the
+minimum number of days required.
+
+EXAMPLE:
+Consider arr = {1, 10, 3, 10, 2}, m = 3, and k = 1.
+We need three bouquets, each requiring one flower. By day 3,
+the flowers with blooming days 1, 3, and 2 are available, so
+we can make all three bouquets. The minimum day is 3.
+
+COMPLEXITY:
+Let n be the number of flowers and M be the maximum blooming day.
+
+Time Complexity: O(n * log M), because each helper-function call
+takes O(n) time and binary search takes O(log M) iterations.
+
+Auxiliary Space Complexity: O(1), because we use only a fixed
+number of extra variables.
+*/
+
+
+// ORIGINAL CODE WITH SHORT COMMENTS
+
+class Solution {
+public:
+    // Check whether m bouquets can be made by the given day.
+    bool f(vector<int>& arr, int day, int m, int k) {
+        int n = arr.size();
+        int temp = k;
+
+        for (int i = 0; i < n; i++) {
+            int ele = arr[i];
+
+            if (ele <= day) {
+                k--;
+
+                if (!k) {
+                    k = temp; // Reset for the next bouquet.
+                    m--;
+
+                    if (!m) {
+                        return true; // All bouquets are made.
+                    }
+                }
+            } else {
+                k = temp; // Break the consecutive sequence.
+            }
+        }
+
+        return false;
+    }
+
+    // Find the minimum day using binary search.
+    int minDays(vector<int>& arr, int m, int k) {
+        int n = arr.size();
+        int start = 1;
+        int end = *max_element(arr.begin(), arr.end());
+        int ans = -1;
+
+        // Check whether enough flowers exist.
+        if (1LL * m * k > n) {
+            return -1;
+        }
+
+        while (start <= end) {
+            int mid = start + (end - start) / 2;
+            bool flag = f(arr, mid, m, k);
+
+            if (flag) {
+                ans = mid;       // Valid day: search earlier.
+                end = mid - 1;
+            } else {
+                start = mid + 1; // Invalid day: search later.
+            }
+        }
+
+        return ans;
+    }
+};
