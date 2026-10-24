@@ -1,0 +1,162 @@
+
+/*
+PROBLEM: CAPACITY TO SHIP PACKAGES WITHIN D DAYS
+=================================================
+
+APPROACH: BINARY SEARCH ON THE ANSWER
+
+PROBLEM UNDERSTANDING:
+We are given an array 'arr', where arr[i] represents the weight of
+the i-th package. We must ship all packages within 'max_days' days.
+
+Packages must be shipped in the same order as they appear in the
+array. We cannot change their order, and the total weight shipped
+on any day cannot exceed the ship's capacity.
+
+Our task is to find the minimum ship capacity that allows us to
+ship all packages within the given number of days.
+
+HELPER FUNCTION f():
+The helper function checks whether a given ship capacity can ship
+all packages within max_days.
+
+We use curr_weight to store the total weight loaded onto the ship
+for the current day. We initialize curr_days = 1 because shipping
+starts on the first day.
+
+We traverse the array from left to right. For each package, we
+check whether adding its weight would exceed max_weight.
+
+If curr_weight + ele > max_weight, the package cannot fit on the
+current day's shipment. We start a new day by increasing curr_days
+and resetting curr_weight to zero.
+
+If curr_days exceeds max_days, the capacity is too small, so we
+return false immediately.
+
+After starting a new day, we add the current package's weight to
+curr_weight. This ensures that the package is not skipped.
+
+If all packages are processed without exceeding max_days, the
+capacity is sufficient, and we return true.
+
+SEARCH SPACE:
+The minimum possible capacity is max(arr), because the ship must
+be able to carry the heaviest package.
+
+The maximum possible capacity is the sum of all package weights.
+With this capacity, all packages can be shipped in a single day.
+
+Therefore, the answer lies between max(arr) and the sum of arr.
+
+WHY BINARY SEARCH WORKS:
+If a capacity is sufficient, any larger capacity is also sufficient
+because it can carry everything that the smaller capacity can carry.
+
+If a capacity is insufficient, any smaller capacity is also
+insufficient.
+
+This creates a monotonic pattern: smaller capacities may be
+invalid, while larger capacities eventually become valid.
+
+We use binary search to find the smallest capacity that works.
+
+BINARY SEARCH LOGIC:
+We calculate mid and use f(arr, mid, max_days) to check whether
+that capacity can ship all packages on time.
+
+If the capacity is sufficient, we save it in ans and search the
+left half using end = mid - 1. This helps us find a smaller
+capacity that may also work.
+
+If the capacity is insufficient, we search the right half using
+start = mid + 1 because we need a larger capacity.
+
+We continue until start > end and return ans, which contains the
+minimum capacity that satisfies the condition.
+
+EXAMPLE:
+Consider arr = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10} and max_days = 5.
+
+The minimum capacity cannot be less than 10 because the heaviest
+package weighs 10. The maximum capacity is 55, the sum of all
+weights.
+
+Binary search tests capacities within this range. A capacity of
+15 can ship the packages in five days:
+    Day 1: 1, 2, 3, 4, 5       (weight 15)
+    Day 2: 6, 7                (weight 13)
+    Day 3: 8                   (weight 8)
+    Day 4: 9                   (weight 9)
+    Day 5: 10                  (weight 10)
+
+The algorithm continues searching for a smaller valid capacity
+instead of stopping at the first capacity that works.
+
+COMPLEXITY:
+Let n be the number of packages, L be the maximum package weight,
+and S be the sum of all package weights.
+
+Time Complexity: O(n * log(S - L + 1)), commonly written as
+O(n * log S). Each helper-function call takes O(n) time, and
+binary search examines the capacity range.
+
+Auxiliary Space Complexity: O(1), because only a fixed number
+of extra variables are used.
+*/
+
+
+// ORIGINAL CODE WITH SHORT COMMENTS
+
+class Solution {
+public:
+    // Check whether all packages can be shipped within max_days.
+    bool f(vector<int>& arr, int max_weight, int max_days) {
+        int n = arr.size();
+        int curr_weight = 0;
+        int curr_days = 1;
+
+        for (int i = 0; i < n; i++) {
+            int ele = arr[i];
+
+            if (curr_weight + ele > max_weight) {
+                curr_days++;
+
+                // Capacity is insufficient if too many days are needed.
+                if (curr_days > max_days) {
+                    return false;
+                }
+
+                curr_weight = 0; // Start a new day's shipment.
+            }
+
+            curr_weight += ele; // Load the current package.
+        }
+
+        return true;
+    }
+
+    // Find the minimum ship capacity using binary search.
+    int shipWithinDays(vector<int>& arr, int max_days) {
+        int n = arr.size();
+        int start = *max_element(arr.begin(), arr.end());
+        int end = accumulate(arr.begin(), arr.end(), 0);
+        int ans = -1;
+
+        while (start <= end) {
+            int mid = start + (end - start) / 2;
+            int max_weight = mid;
+
+            bool flag = f(arr, max_weight, max_days);
+
+            if (flag) {
+                ans = max_weight; // Valid capacity: try a smaller one.
+                end = mid - 1;
+            } else {
+                start = mid + 1;  // Invalid capacity: increase it.
+            }
+        }
+
+        return ans;
+    }
+};
