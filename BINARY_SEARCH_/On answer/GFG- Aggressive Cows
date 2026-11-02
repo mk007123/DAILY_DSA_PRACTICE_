@@ -1,0 +1,288 @@
+/*
+PROBLEM: AGGRESSIVE COWS
+=================================================
+
+APPROACH: BINARY SEARCH ON THE ANSWER
+
+PROBLEM UNDERSTANDING:
+We are given an array 'arr', where arr[i] represents the position
+of the i-th stall. We are also given an integer 'k', representing
+the number of cows that we need to place.
+
+We have to place all k cows in different stalls.
+
+Our task is to maximize the minimum distance between any two cows.
+
+In simple words, we want to place the cows as far apart as possible
+so that the minimum distance between any two cows is maximum.
+
+First, we sort the array because we want to consider the stalls
+in increasing order of their positions.
+
+HELPER FUNCTION f():
+The helper function checks whether we can place all cows while
+maintaining at least 'mini' distance between every two cows.
+
+We initialize 'place = arr[0]' because we place the first cow
+at the first stall.
+
+Since one cow is already placed, we pass k-1 as the remaining
+number of cows to the helper function.
+
+We traverse the array from left to right, starting from index 1.
+
+For every stall, we calculate the minimum position where the
+next cow can be placed:
+
+    target = place + mini
+
+Here, 'place' represents the position of the last placed cow,
+and 'mini' represents the minimum distance we want to maintain.
+
+We check whether the current stall position is greater than
+or equal to target.
+
+If ele >= target, we can place the next cow at this stall.
+
+After placing the cow:
+    1. We decrease the remaining number of cows.
+    2. We update 'place' to the current stall position.
+
+Updating 'place' is important because the next cow must maintain
+the required minimum distance from the most recently placed cow.
+
+If all cows are placed, we return true immediately.
+
+If we finish traversing the array and some cows are still left,
+it means we cannot place all cows with the given minimum distance,
+so we return false.
+
+SEARCH SPACE:
+The minimum possible distance is 1 because stall positions are
+integers and we need to place cows in different stalls.
+
+The maximum possible distance is:
+
+    arr[n-1] - arr[0]
+
+This is because the maximum distance cannot exceed the distance
+between the first and last stall.
+
+Therefore, our answer lies between:
+
+    start = 1
+    end = arr[n-1] - arr[0]
+
+WHY BINARY SEARCH WORKS:
+Suppose we can place all cows while maintaining a minimum
+distance of 3.
+
+Then we can also place all cows with minimum distances of 2 and 1.
+
+However, if we cannot place all cows with a minimum distance
+of 4, then we cannot place them with distances of 5, 6, 7, etc.
+
+This creates a monotonic pattern:
+
+    Smaller distances  -> Possible
+    Larger distances   -> Not possible
+
+More specifically, once a distance becomes impossible,
+all greater distances will also be impossible.
+
+Therefore, we can apply Binary Search to find the maximum
+possible minimum distance.
+
+BINARY SEARCH LOGIC:
+We calculate mid and call:
+
+    f(arr, mid, k-1)
+
+Here, mid represents the minimum distance we are trying
+to maintain between cows.
+
+If the helper function returns true:
+
+    1. The current distance is possible.
+    2. We store mid in ans.
+    3. We search the right half using start = mid + 1.
+
+We search the right half because we want to find an even
+larger minimum distance.
+
+If the helper function returns false:
+
+    1. The current distance is not possible.
+    2. We search the left half using end = mid - 1.
+
+We decrease the distance because the current distance
+is too large to place all cows.
+
+We continue until start > end.
+
+Finally, we return ans, which contains the maximum possible
+minimum distance.
+
+EXAMPLE:
+Consider:
+
+    arr = {1, 2, 4, 8, 9}
+    k = 3
+
+First, we sort the array:
+
+    arr = {1, 2, 4, 8, 9}
+
+We need to place 3 cows.
+
+Suppose we try minimum distance = 3.
+
+We place the first cow at position 1.
+
+Now, we have 2 cows left.
+
+    Cow 1: Position 1
+
+    Cow 2: Position 4
+    Distance = 4 - 1 = 3
+
+    Cow 3: Position 8
+    Distance = 8 - 4 = 4
+
+All 3 cows are successfully placed.
+
+Therefore, minimum distance = 3 is possible.
+
+Now, suppose we try minimum distance = 4.
+
+    Cow 1: Position 1
+
+    Cow 2: Position 8
+    Distance = 8 - 1 = 7
+
+There is no remaining stall at a distance of at least 4
+from position 8.
+
+Therefore, we cannot place all 3 cows.
+
+So, minimum distance = 4 is not possible.
+
+The possible distances are:
+
+    Distance 1 -> Possible
+    Distance 2 -> Possible
+    Distance 3 -> Possible
+    Distance 4 -> Not Possible
+
+Therefore, the answer is 3.
+
+COMPLEXITY:
+Let n be the number of stalls and D be the difference
+between the last and first stall positions.
+
+Time Complexity:
+    Sorting: O(n * log n)
+
+    Binary Search: O(log D)
+
+    Each helper function call: O(n)
+
+    Total: O(n * log n + n * log D)
+
+Auxiliary Space Complexity:
+    O(1) for the helper function and binary search variables,
+    excluding sorting implementation details.
+
+    Note: The given helper function takes the array by value,
+    so it creates an additional O(n) copy.
+
+*/
+
+
+// ORIGINAL CODE WITH SHORT COMMENTS
+
+class Solution {
+public:
+
+    // Check whether we can place all cows with at least
+    // 'mini' distance between every two cows.
+    bool f(vector<int> arr, int mini, int cows) {
+
+        int n = arr.size();
+
+        // Place the first cow at the first stall.
+        int place = arr[0];
+
+        // Traverse the remaining stalls.
+        for(int i = 1; i < n; i++) {
+
+            // Minimum position required for the next cow.
+            int target = place + mini;
+
+            int ele = arr[i];
+
+            // Check whether the current stall is suitable.
+            if(ele >= target) {
+
+                cows--; // One cow has been placed.
+
+                // All cows have been successfully placed.
+                if(!cows) {
+                    return true;
+                }
+
+                // Update the position of the last placed cow.
+                place = ele;
+            }
+        }
+
+        // If cows are still left, the distance is not possible.
+        return cows <= 0;
+    }
+
+
+    // Find the maximum possible minimum distance using
+    // Binary Search on the Answer.
+    int aggressiveCows(vector<int>& arr, int k) {
+
+        int n = arr.size();
+
+        // Sort stall positions in increasing order.
+        sort(arr.begin(), arr.end());
+
+        // Minimum possible distance.
+        int start = 1;
+
+        // Maximum possible distance.
+        int end = arr[n-1] - arr[0];
+
+        int ans = -1;
+
+        while(start <= end) {
+
+            // Try the middle distance.
+            int mid = start + (end - start) / 2;
+
+            // Check whether we can place all remaining cows.
+            bool flag = f(arr, mid, k-1);
+
+            if(flag) {
+
+                // Current distance is possible.
+                // Try to find a larger minimum distance.
+                ans = mid;
+                start = mid + 1;
+
+            }
+            else {
+
+                // Current distance is not possible.
+                // Try a smaller minimum distance.
+                end = mid - 1;
+            }
+        }
+
+        // Return the maximum possible minimum distance.
+        return ans;
+    }
+};
