@@ -1,1 +1,365 @@
 
+/*
+PROBLEM: COUNT DISTINCT VALUES
+=================================================
+
+PROBLEM UNDERSTANDING:
+
+We are given an array containing n integers.
+
+Our task is to calculate the number of distinct values
+present in the array.
+
+Distinct values means values that appear only once
+when we consider unique values.
+
+For example:
+
+arr = [2, 3, 2, 2, 3]
+
+Distinct values are:
+
+2 and 3
+
+Therefore, the answer is 2.
+
+
+APPROACH: SORTING + TWO POINTERS
+=================================================
+
+STEP 1:
+Sort the array in ascending order.
+
+After sorting, all duplicate elements will come together.
+
+Example:
+
+Original array:
+
+[2, 3, 2, 2, 3]
+
+After sorting:
+
+[2, 2, 2, 3, 3]
+
+
+STEP 2:
+We use two variables:
+
+i = 0
+j = 1
+
+Here:
+
+i points to the last unique element.
+j is used to traverse the remaining array.
+
+
+STEP 3:
+Compare arr[i] and arr[j].
+
+CASE 1:
+If arr[i] == arr[j]
+
+Both elements are equal.
+
+This means arr[j] is a duplicate.
+
+We do not increase i.
+
+We only increase j through the loop.
+
+
+CASE 2:
+If arr[i] != arr[j]
+
+We have found a new distinct element.
+
+We store this new element in:
+
+arr[i + 1] = arr[j]
+
+Then increase i.
+
+This makes i point to the newly found distinct element.
+
+
+STEP 4:
+After the loop finishes:
+
+i represents the index of the last distinct element.
+
+Since array indexing starts from 0:
+
+Number of distinct elements = i + 1
+
+
+WHY THIS APPROACH WORKS:
+
+Sorting places all duplicate elements together.
+
+Therefore, whenever arr[i] and arr[j] are different,
+we have found a new distinct value.
+
+We move that value to the next position
+in the beginning of the array.
+
+Finally, i + 1 gives the total number
+of distinct values.
+
+
+EXAMPLE:
+
+arr = [2, 3, 2, 2, 3]
+
+After sorting:
+
+arr = [2, 2, 2, 3, 3]
+
+Initially:
+
+i = 0
+
+j = 1
+
+We compare arr[i] and arr[j].
+
+If they are equal, we skip the duplicate.
+
+If they are different, we store the new value
+at arr[i + 1] and increase i.
+
+After completing the traversal:
+
+i = 1
+
+Therefore:
+
+Answer = i + 1 = 2
+
+
+TIME COMPLEXITY:
+
+Sorting:
+O(n log n)
+
+Traversing:
+O(n)
+
+Overall:
+O(n log n)
+
+
+AUXILIARY SPACE COMPLEXITY:
+
+O(1) extra space for the two-pointer traversal,
+excluding sorting implementation details.
+
+Note:
+The given function modifies the original array.
+*/
+
+
+#include <iostream>
+#include <bits/stdc++.h>
+using namespace std;
+
+
+// FUNCTION: COUNT DISTINCT VALUES
+// =================================================
+//
+// n      = number of elements in the array
+// arr[]  = array containing the given elements
+//
+// RETURN:
+// Number of distinct values present in the array
+
+int f(int n, int arr[])
+{
+
+    // STEP 1:
+    // Sort the array in ascending order.
+    //
+    // After sorting, duplicate elements
+    // will come together.
+    //
+    // Example:
+    //
+    // Before sorting:
+    // [2, 3, 2, 2, 3]
+    //
+    // After sorting:
+    // [2, 2, 2, 3, 3]
+
+    sort(arr, arr + n);
+
+
+    // STEP 2:
+    // Initialize i to 0.
+    //
+    // i represents the index of the last
+    // distinct element found.
+    //
+    // Initially, arr[0] is considered
+    // the first distinct element.
+
+    int i = 0;
+
+
+    // STEP 3:
+    // Traverse the array using j.
+    //
+    // We start j from 1 because arr[0]
+    // is already considered a distinct element.
+    //
+    // j moves from index 1 to index n - 1.
+
+    for (int j = 1; j < n; j++)
+    {
+
+        // STEP 4:
+        // Store the element at index i.
+        //
+        // This is the last distinct element
+        // found so far.
+
+        int start = arr[i];
+
+
+        // Store the current element at index j.
+        //
+        // We compare this element with
+        // the last distinct element.
+
+        int end = arr[j];
+
+
+        // CASE 1:
+        // If both elements are different,
+        // we have found a new distinct value.
+
+        if (start != end)
+        {
+
+            // STEP 5:
+            // Store the new distinct element
+            // at the next position after i.
+            //
+            // This moves the distinct element
+            // towards the beginning of the array.
+            //
+            // Example:
+            //
+            // arr = [2, 2, 2, 3, 3]
+            //
+            // arr[i + 1] = arr[j]
+            //
+            // arr = [2, 3, 2, 3, 3]
+
+            arr[i + 1] = arr[j];
+
+
+            // STEP 6:
+            // Increase i.
+            //
+            // Now i points to the newly
+            // found distinct element.
+            //
+            // This element becomes the
+            // reference for the next comparison.
+
+            i++;
+
+        }
+
+        // CASE 2:
+        // If start == end
+        //
+        // The current element is a duplicate.
+        //
+        // We do not need to do anything.
+        //
+        // The loop automatically increases j
+        // and checks the next element.
+
+    }
+
+
+    // STEP 7:
+    // Return the number of distinct elements.
+    //
+    // i represents the index of the last
+    // distinct element.
+    //
+    // Since indexing starts from 0:
+    //
+    // Number of distinct elements = i + 1
+
+    return i + 1;
+
+}
+
+
+// MAIN FUNCTION
+// =================================================
+
+int main()
+{
+
+    // STEP 1:
+    // Take the number of elements in the array.
+
+    int n;
+    cin >> n;
+
+
+    // STEP 2:
+    // Declare an array of size n.
+    //
+    // This array will store the given elements.
+
+    int arr[n];
+
+
+    // STEP 3:
+    // Take n integers as input.
+    //
+    // Store each integer inside the array.
+
+    for (int i = 0; i < n; i++)
+    {
+
+        // Take one element as input.
+
+        int ele;
+        cin >> ele;
+
+
+        // Store the element at index i.
+
+        arr[i] = ele;
+
+    }
+
+
+    // STEP 4:
+    // Call the function f().
+    //
+    // Pass:
+    //
+    // n     = number of elements
+    // arr   = array containing the elements
+    //
+    // The function returns the number
+    // of distinct values.
+
+    cout << f(n, arr) << endl;
+
+
+    // STEP 5:
+    // End the program.
+
+    return 0;
+
+}
+
