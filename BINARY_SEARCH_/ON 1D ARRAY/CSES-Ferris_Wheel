@@ -1,0 +1,365 @@
+/*
+PROBLEM: FERRIS WHEEL
+=================================================
+
+APPROACH: GREEDY APPROACH + SORTING + TWO POINTERS
+
+PROBLEM UNDERSTANDING:
+-------------------------------------------------
+We are given:
+1. n children.
+2. An array arr[], where arr[i] represents the weight of the i-th child.
+3. max_weight (x), which represents the maximum weight allowed in one gondola.
+
+Our task is to find the MINIMUM number of gondolas required
+to take all the children on the Ferris wheel.
+
+IMPORTANT RULES:
+1. Each gondola can carry maximum 2 children.
+2. The total weight of children in one gondola must not
+   exceed max_weight.
+3. Every child must get a gondola.
+4. A child cannot be divided into multiple gondolas.
+
+-------------------------------------------------
+GREEDY APPROACH:
+-------------------------------------------------
+
+The main idea is to always consider the HEAVIEST child first.
+
+We sort the array in ascending order.
+
+After sorting:
+- arr[i] represents the lightest child.
+- arr[j] represents the heaviest child.
+
+We use two pointers:
+
+i = 0       -> points to the lightest child
+j = n - 1   -> points to the heaviest child
+
+We try to put the lightest and heaviest children together.
+
+CASE 1:
+If arr[i] + arr[j] <= max_weight:
+
+Both children can fit in one gondola.
+
+Therefore:
+- Increase i to move to the next lightest child.
+- Decrease j to move to the next heaviest child.
+- Increase ans because one gondola has been used.
+
+CASE 2:
+If arr[i] + arr[j] > max_weight:
+
+Both children cannot fit together.
+
+Since arr[j] is the heaviest child, we cannot pair
+this child with any other remaining child.
+
+Therefore:
+- Put the heaviest child alone.
+- Decrease j.
+- Increase ans.
+
+IMPORTANT:
+We do not need to check other children for the heaviest child.
+
+If the heaviest child cannot fit with the lightest child,
+then it cannot fit with any other remaining child because
+all other children are equally heavy or heavier than arr[i].
+
+-------------------------------------------------
+WHY DO WE USE SORTING?
+-------------------------------------------------
+
+Sorting helps us easily find:
+
+1. The lightest child using arr[i].
+2. The heaviest child using arr[j].
+
+This allows us to decide whether both children can
+fit in the same gondola.
+
+-------------------------------------------------
+WHY DO WE USE TWO POINTERS?
+-------------------------------------------------
+
+We use two pointers because we need to consider
+the lightest and heaviest remaining children.
+
+i moves from the beginning.
+j moves from the end.
+
+When both children are paired:
+i++;
+j--;
+
+When the heaviest child goes alone:
+j--;
+
+This continues until all children are assigned.
+
+-------------------------------------------------
+WHY IS WHILE(i <= j) USED?
+-------------------------------------------------
+
+The loop continues while i <= j.
+
+This handles two situations:
+
+1. i < j:
+   There are at least two remaining children.
+   We check whether they can fit together.
+
+2. i == j:
+   Only one child remains.
+   This child needs one separate gondola.
+
+In your code, you handle the second case using:
+
+if(i == j)
+{
+    return ans + 1;
+}
+
+This is correct because one child remains,
+and that child needs one more gondola.
+
+-------------------------------------------------
+EXAMPLE:
+-------------------------------------------------
+
+Input:
+n = 4
+max_weight = 10
+
+arr[] = {7, 2, 3, 9}
+
+STEP 1:
+Sort the array.
+
+arr[] = {2, 3, 7, 9}
+
+i = 0
+j = 3
+ans = 0
+
+STEP 2:
+Lightest child = arr[0] = 2
+Heaviest child = arr[3] = 9
+
+2 + 9 = 11
+
+11 > 10
+
+Both cannot fit together.
+
+Put the heaviest child (9) alone.
+
+j = 2
+ans = 1
+
+STEP 3:
+Lightest child = arr[0] = 2
+Heaviest child = arr[2] = 7
+
+2 + 7 = 9
+
+9 <= 10
+
+Both can fit together.
+
+Put 2 and 7 in one gondola.
+
+i = 1
+j = 1
+ans = 2
+
+STEP 4:
+Now i == j.
+
+Only one child remains.
+
+arr[1] = 3
+
+This child needs one gondola.
+
+Return ans + 1.
+
+Answer = 3 gondolas.
+
+-------------------------------------------------
+TIME COMPLEXITY:
+-------------------------------------------------
+
+Sorting:
+O(n log n)
+
+Two pointer traversal:
+O(n)
+
+Total:
+O(n log n)
+
+-------------------------------------------------
+AUXILIARY SPACE COMPLEXITY:
+-------------------------------------------------
+
+Sorting is done directly on the original array.
+
+Two pointers and ans use constant extra space.
+
+Auxiliary space:
+O(1) excluding sorting implementation details.
+
+=================================================
+CODE WITH COMMENTS
+=================================================
+*/
+
+#include <iostream>
+#include <bits/stdc++.h>
+using namespace std;
+
+// Function to calculate the minimum number of gondolas.
+//
+// arr[]       -> Array containing the weight of each child.
+// max_weight  -> Maximum weight allowed in one gondola.
+// n           -> Total number of children.
+//
+// We use int &n to pass n by reference.
+// However, n does not need to be changed inside this function.
+// It can simply be passed as int n.
+int f(int arr[], int max_weight, int &n)
+{
+    // ans stores the total number of gondolas required.
+    int ans = 0;
+
+    // Sort the array in ascending order.
+    //
+    // After sorting:
+    // arr[0]     -> Lightest child.
+    // arr[n - 1] -> Heaviest child.
+    sort(arr, arr + n);
+
+    // i points to the lightest remaining child.
+    int i = 0;
+
+    // j points to the heaviest remaining child.
+    int j = n - 1;
+
+    // Continue until all children are assigned.
+    //
+    // i <= j also handles the case when only
+    // one child remains.
+    while (i <= j)
+    {
+        // CASE 1:
+        // Only one child remains.
+        //
+        // Since i == j, both pointers point to
+        // the same child.
+        //
+        // This child needs one separate gondola.
+        if (i == j)
+        {
+            // Return the current gondola count + 1.
+            return ans + 1;
+        }
+
+        // Store the weight of the lightest remaining child.
+        int left = arr[i];
+
+        // Store the weight of the heaviest remaining child.
+        int right = arr[j];
+
+        // CASE 2:
+        // Check whether the lightest and heaviest children
+        // can fit together in one gondola.
+        if (left + right <= max_weight)
+        {
+            // Both children can fit together.
+
+            // Move i to the next lightest child.
+            i++;
+
+            // Move j to the next heaviest child.
+            j--;
+
+            // One gondola has been used for these two children.
+            ans++;
+        }
+        else
+        {
+            // CASE 3:
+            // The lightest and heaviest children cannot fit
+            // together because their total weight exceeds
+            // max_weight.
+            //
+            // Since arr[j] is the heaviest remaining child,
+            // it cannot fit with any other remaining child.
+            //
+            // Therefore, put the heaviest child alone.
+
+            // One gondola has been used.
+            ans++;
+
+            // Remove the heaviest child from consideration.
+            j--;
+        }
+    }
+
+    // Return the total number of gondolas.
+    //
+    // Normally, the function returns from the i == j case
+    // when one child remains.
+    //
+    // If all children have already been assigned,
+    // return ans.
+    return ans;
+}
+
+int main()
+{
+    // n represents the total number of children.
+    // x represents the maximum weight allowed
+    // in one gondola.
+    int n, x;
+
+    // Read the number of children and maximum weight.
+    cin >> n >> x;
+
+    // Create an array to store the weight of each child.
+    //
+    // NOTE:
+    // int arr[n] is supported by some compilers like GCC,
+    // but it is not standard C++.
+    int arr[n];
+
+    // Read the weight of every child.
+    for (int i = 0; i < n; i++)
+    {
+        // Store the weight of the current child.
+        int ele;
+
+        // Read the child's weight.
+        cin >> ele;
+
+        // Store the weight in the array.
+        arr[i] = ele;
+    }
+
+    // Call the function.
+    //
+    // f(arr, x, n):
+    // arr -> Array containing children's weights.
+    // x   -> Maximum weight allowed in one gondola.
+    // n   -> Total number of children.
+    //
+    // Print the minimum number of gondolas required.
+    cout << f(arr, x, n) << endl;
+
+    return 0;
+}
