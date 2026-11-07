@@ -1,0 +1,490 @@
+
+/*
+PROBLEM: CONCERT TICKETS
+=================================================
+
+APPROACH: MULTISET + UPPER_BOUND + GREEDY
+
+PROBLEM UNDERSTANDING:
+-------------------------------------------------
+We are given:
+
+1. n tickets.
+2. Each ticket has a certain price.
+3. m customers arrive one after another.
+4. Each customer tells us the maximum price they
+   are willing to pay.
+
+For every customer, we must give them a ticket
+whose price is:
+
+- Less than or equal to their maximum price.
+- As close as possible to their maximum price.
+
+In simple words:
+
+We must find the LARGEST ticket price <= customer's
+maximum price.
+
+After selling a ticket, that ticket cannot be
+sold again.
+
+If no affordable ticket exists, print -1.
+
+-------------------------------------------------
+WHY DO WE USE MULTISET?
+-------------------------------------------------
+
+We use multiset<int> to store ticket prices.
+
+A multiset:
+
+1. Stores elements in sorted order automatically.
+2. Allows duplicate elements.
+3. Supports upper_bound().
+4. Allows efficient insertion and deletion.
+
+Example:
+
+Tickets:
+5 3 7 8 5
+
+Multiset stores:
+
+3 5 5 7 8
+
+Notice:
+Both tickets costing 5 are stored.
+
+We do not need to call sort() because multiset
+already maintains sorted order.
+
+-------------------------------------------------
+GREEDY APPROACH:
+-------------------------------------------------
+
+For every customer:
+
+STEP 1:
+Read the maximum price they can pay.
+
+STEP 2:
+Use upper_bound() to find the first ticket
+whose price is strictly greater than their
+maximum price.
+
+STEP 3:
+If upper_bound() points to begin():
+
+No ticket is affordable.
+
+Print -1.
+
+STEP 4:
+Otherwise, move the iterator one position backward.
+
+Now it points to the largest ticket price
+which is <= customer's maximum price.
+
+STEP 5:
+Print that ticket price.
+
+STEP 6:
+Remove that ticket from the multiset.
+
+This ensures the same ticket cannot be
+sold again.
+
+-------------------------------------------------
+WHAT DOES UPPER_BOUND() DO?
+-------------------------------------------------
+
+Suppose:
+
+m1 = {3, 5, 5, 7, 8}
+
+Customer maximum price:
+
+ele = 6
+
+We write:
+
+auto it = m1.upper_bound(ele);
+
+upper_bound(6) points to the first element
+strictly greater than 6.
+
+Therefore, it points to 7.
+
+Now:
+
+it--;
+
+Moves the iterator one position backward.
+
+It now points to 5.
+
+Therefore:
+
+5 is the largest ticket price <= 6.
+
+-------------------------------------------------
+WHY DO WE CHECK it == m1.begin()?
+-------------------------------------------------
+
+Suppose:
+
+m1 = {5, 7, 8}
+
+Customer maximum price:
+
+ele = 3
+
+upper_bound(3) points to 5.
+
+But 5 is the first element.
+
+Therefore:
+
+it == m1.begin()
+
+This means there is no ticket whose price
+is <= 3.
+
+So we print -1.
+
+IMPORTANT:
+
+We must check this condition BEFORE doing it--.
+
+Otherwise, we may move before the beginning
+of the multiset.
+
+-------------------------------------------------
+WHY DO WE USE m1.erase(it)?
+-------------------------------------------------
+
+Suppose:
+
+m1 = {3, 5, 5, 7, 8}
+
+We sell one ticket costing 5.
+
+We write:
+
+m1.erase(it);
+
+This removes only the element pointed to
+by the iterator.
+
+Remaining:
+
+3 5 7 8
+
+IMPORTANT:
+
+m1.erase(5);
+
+would remove ALL tickets costing 5.
+
+But we want to remove only one ticket.
+
+Therefore, iterator-based erase is used.
+
+-------------------------------------------------
+EXAMPLE DRY RUN:
+-------------------------------------------------
+
+Input:
+
+n = 5
+customers = 3
+
+Tickets:
+
+5 3 7 8 5
+
+Customers:
+
+4 8 3
+
+Initially:
+
+m1 = {3, 5, 5, 7, 8}
+
+-------------------------------------------------
+CUSTOMER 1:
+-------------------------------------------------
+
+Maximum price:
+
+ele = 4
+
+upper_bound(4) points to 5.
+
+Move one position backward.
+
+Ticket price = 3
+
+Print:
+
+3
+
+Remove ticket 3.
+
+Remaining:
+
+m1 = {5, 5, 7, 8}
+
+-------------------------------------------------
+CUSTOMER 2:
+-------------------------------------------------
+
+Maximum price:
+
+ele = 8
+
+upper_bound(8) points to end().
+
+Move one position backward.
+
+Ticket price = 8
+
+Print:
+
+8
+
+Remove ticket 8.
+
+Remaining:
+
+m1 = {5, 5, 7}
+
+-------------------------------------------------
+CUSTOMER 3:
+-------------------------------------------------
+
+Maximum price:
+
+ele = 3
+
+upper_bound(3) points to 5.
+
+But 5 is the first element.
+
+Therefore:
+
+it == m1.begin()
+
+No ticket is affordable.
+
+Print:
+
+-1
+
+-------------------------------------------------
+FINAL OUTPUT:
+-------------------------------------------------
+
+3
+8
+-1
+
+=================================================
+TIME COMPLEXITY:
+=================================================
+
+Insertion of n tickets:
+
+O(n log n)
+
+For each customer:
+
+upper_bound() = O(log n)
+
+Removing ticket using iterator:
+
+Amortized O(1)
+
+For m customers:
+
+O(m log n)
+
+TOTAL:
+
+O(n log n + m log n)
+
+Or:
+
+O((n + m) log n)
+
+=================================================
+AUXILIARY SPACE COMPLEXITY:
+=================================================
+
+Multiset stores n ticket prices.
+
+Customer array stores m maximum prices.
+
+Total storage:
+
+O(n + m)
+
+=================================================
+CODE WITH COMMENTS
+=================================================
+*/
+
+#include <iostream>
+#include <bits/stdc++.h>
+using namespace std;
+
+// Function to process all customers.
+//
+// n         -> Total number of tickets.
+// customers -> Total number of customers.
+// m1        -> Multiset containing ticket prices.
+// arr2      -> Array containing customers' maximum prices.
+//
+// The multiset is passed by reference because
+// we need to remove sold tickets from the
+// original multiset.
+void f(int n, int customers, multiset<int> &m1, int arr2[])
+{
+    // Process customers one by one.
+    //
+    // Customers arrive in the given order.
+    // Therefore, we cannot change their order.
+    for (int i = 0; i < customers; i++)
+    {
+        // Store the maximum price the
+        // current customer is willing to pay.
+        int ele = arr2[i];
+
+        // Find the first ticket price
+        // strictly greater than ele.
+        //
+        // Example:
+        // m1 = {3, 5, 5, 7, 8}
+        // ele = 6
+        //
+        // upper_bound(6) points to 7.
+        auto it = m1.upper_bound(ele);
+
+        // Check whether the iterator
+        // points to the beginning.
+        //
+        // If it == begin():
+        // No ticket price is <= ele.
+        //
+        // Therefore, this customer
+        // cannot purchase any ticket.
+        if (it == m1.begin())
+        {
+            // Print -1 because no
+            // affordable ticket exists.
+            cout << -1 << endl;
+        }
+        else
+        {
+            // Move one position backward.
+            //
+            // upper_bound() points to the
+            // first element greater than ele.
+            //
+            // After it--:
+            // It points to the largest
+            // ticket price <= ele.
+            it--;
+
+            // Print the ticket price.
+            //
+            // *it gives the value stored
+            // at the iterator.
+            cout << *it << endl;
+
+            // Remove only the ticket
+            // pointed to by this iterator.
+            //
+            // This ticket cannot be
+            // purchased by another customer.
+            //
+            // Other tickets having the
+            // same price remain available.
+            m1.erase(it);
+        }
+    }
+}
+
+int main()
+{
+    // n represents the number of tickets.
+    //
+    // customers represents the number
+    // of customers arriving.
+    int n, customers;
+
+    // Read number of tickets
+    // and number of customers.
+    cin >> n >> customers;
+
+    // Create a multiset to store ticket prices.
+    //
+    // Multiset automatically maintains
+    // elements in sorted order.
+    //
+    // Duplicate ticket prices are allowed.
+    multiset<int> m1;
+
+    // Create an array to store
+    // maximum price for each customer.
+    int arr2[customers];
+
+    // Read ticket prices.
+    for (int i = 0; i < n; i++)
+    {
+        // Store the price of
+        // the current ticket.
+        int ele;
+
+        // Read ticket price.
+        cin >> ele;
+
+        // Insert ticket price into multiset.
+        //
+        // Multiset automatically places
+        // the element in sorted order.
+        m1.insert(ele);
+    }
+
+    // Read maximum price
+    // for every customer.
+    for (int i = 0; i < customers; i++)
+    {
+        // Store maximum price
+        // for the current customer.
+        int ele;
+
+        // Read customer's maximum price.
+        cin >> ele;
+
+        // Store it in the array.
+        arr2[i] = ele;
+    }
+
+    // Call the function to process customers.
+    //
+    // n         -> Number of tickets.
+    // customers -> Number of customers.
+    // m1        -> Multiset containing tickets.
+    // arr2      -> Customers' maximum prices.
+    //
+    // The function prints the ticket price
+    // for every customer.
+    //
+    // If no affordable ticket exists,
+    // it prints -1.
+    f(n, customers, m1, arr2);
+
+    return 0;
+}
