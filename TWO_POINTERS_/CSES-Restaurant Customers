@@ -1,0 +1,202 @@
+
+#include <iostream>
+#include <bits/stdc++.h>
+using namespace std;
+
+/*
+PROBLEM: MAXIMUM NUMBER OF CUSTOMERS IN A RESTAURANT
+===================================================
+
+PROBLEM UNDERSTANDING:
+
+We are given n customers.
+
+For every customer:
+    arrival[i] = arrival time of customer
+    leaving[i] = leaving time of customer
+
+We need to find the maximum number of customers
+present inside the restaurant at the same time.
+
+APPROACH: TWO POINTER + SORTING
+================================
+
+STEP 1:
+Store arrival times in arrival[].
+
+STEP 2:
+Store leaving times in leaving[].
+
+STEP 3:
+Sort both arrays in ascending order.
+
+STEP 4:
+Use two pointers:
+
+    i = points to the next arrival time
+    j = points to the next leaving time
+
+STEP 5:
+If arrival[i] < leaving[j]:
+
+    A customer arrives before the next customer leaves.
+
+    Increase count.
+    Update ans.
+    Move i forward.
+
+STEP 6:
+Otherwise:
+
+    A customer leaves the restaurant.
+
+    Decrease count.
+    Move j forward.
+
+STEP 7:
+Continue until all arrival or leaving times
+have been processed.
+
+Finally, print ans.
+
+IMPORTANT VARIABLES:
+==================
+
+i:
+    Points to the next customer arrival.
+
+j:
+    Points to the next customer departure.
+
+count:
+    Current number of customers inside
+    the restaurant.
+
+ans:
+    Maximum number of customers present
+    at the same time.
+
+TIME COMPLEXITY:
+================
+
+Sorting arrival[] = O(n log n)
+
+Sorting leaving[] = O(n log n)
+
+Two pointer traversal = O(n)
+
+Overall Time Complexity = O(n log n)
+
+SPACE COMPLEXITY:
+=================
+
+Arrival array = O(n)
+
+Leaving array = O(n)
+
+Overall Space Complexity = O(n)
+*/
+
+
+// Function to find maximum number of customers
+// present inside the restaurant at the same time
+void f(int n, int arrival[], int leaving[])
+{
+    // i points to the next arrival time
+    int i = 0;
+
+    // j points to the next leaving time
+    int j = 0;
+
+    // Stores current number of customers
+    // present inside the restaurant
+    int count = 0;
+
+    // Stores maximum number of customers
+    // present at the same time
+    int ans = 0;
+
+    // Continue while both arrival and leaving
+    // times are available for processing
+    while (i < n && j < n)
+    {
+        // Store the current arrival time
+        int a = arrival[i];
+
+        // Store the earliest leaving time
+        int b = leaving[j];
+
+        // If a customer arrives before
+        // the next customer leaves
+        if (a < b)
+        {
+            // Increase the current customer count
+            count++;
+
+            // Update maximum customer count
+            ans = max(ans, count);
+
+            // Move to the next arrival time
+            i++;
+        }
+        else
+        {
+            // A customer leaves the restaurant
+            // so decrease the current count
+            count--;
+
+            // Move to the next leaving time
+            j++;
+        }
+    }
+
+    // Print maximum number of customers
+    // present inside the restaurant
+    cout << ans << endl;
+}
+
+
+int main()
+{
+    // Stores the total number of customers
+    int n;
+
+    // Take number of customers as input
+    cin >> n;
+
+    // Array to store arrival times
+    int arrival[n];
+
+    // Array to store leaving times
+    int leaving[n];
+
+    // Take arrival and leaving times
+    // of all n customers
+    for (int i = 0; i < n; i++)
+    {
+        // a stores arrival time
+        // l stores leaving time
+        int a, l;
+
+        // Input arrival and leaving time
+        cin >> a >> l;
+
+        // Store arrival time in arrival array
+        arrival[i] = a;
+
+        // Store leaving time in leaving array
+        leaving[i] = l;
+    }
+
+    // Sort arrival times in ascending order
+    sort(arrival, arrival + n);
+
+    // Sort leaving times in ascending order
+    sort(leaving, leaving + n);
+
+    // Call function to calculate
+    // maximum number of customers
+    f(n, arrival, leaving);
+
+    return 0;
+}
