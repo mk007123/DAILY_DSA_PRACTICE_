@@ -1,0 +1,279 @@
+//Method 1
+class Solution {
+public:
+    int longestMonotonicSubarray(vector<int>& arr) {
+
+        int n=arr.size();
+        if(n==1){
+            return 1;
+        }
+        int i=0;
+        int j=1;
+        int ans=1;
+
+        while(j<n){
+            int left=arr[j-1];
+            int right=arr[j];
+            if(right>left){
+                ans=max(ans,j-i+1);
+                j++;
+
+            }
+            else{
+                i=j;
+                j++;
+
+
+            }
+
+
+        }
+        reverse(arr.begin(),arr.end());
+        i=0;
+        j=1;
+        
+
+        while(j<n){
+            int left=arr[j-1];
+            int right=arr[j];
+            if(right>left){
+                ans=max(ans,j-i+1);
+                j++;
+
+            }
+            else{
+                i=j;
+                j++;
+
+
+            }
+
+
+        }
+        reverse(arr.begin(), arr.end());
+        return ans;
+
+
+    }
+};
+//Method 2
+
+class Solution {
+public:
+
+    /*
+    PROBLEM: LONGEST MONOTONIC SUBARRAY
+    ===================================
+
+    PROBLEM UNDERSTANDING:
+
+    We are given an array.
+
+    We need to find the length of the longest contiguous
+    subarray which is either:
+
+    1. Strictly Increasing:
+       Every next element must be greater than the previous element.
+
+    2. Strictly Decreasing:
+       Every next element must be smaller than the previous element.
+
+    IMPORTANT:
+    Equal adjacent elements break both increasing and
+    decreasing sequences.
+
+
+    APPROACH: SINGLE TRAVERSAL + TWO COUNTERS
+    ==========================================
+
+    Instead of traversing the array twice, we solve
+    the problem in a single traversal.
+
+    We maintain two counters:
+
+    inc_ans:
+        Stores the length of the current increasing subarray.
+
+    dec_ans:
+        Stores the length of the current decreasing subarray.
+
+    ans:
+        Stores the maximum length found so far.
+
+
+    THREE POSSIBLE CASES:
+    =====================
+
+    CASE 1: right > left
+
+        The current sequence is increasing.
+
+        - Increase inc_ans.
+        - Update ans.
+        - Reset dec_ans to 1 because the decreasing
+          sequence has broken.
+        - Move j forward.
+
+
+    CASE 2: right == left
+
+        Both increasing and decreasing sequences break.
+
+        - Reset inc_ans to 1.
+        - Reset dec_ans to 1.
+        - Move j forward.
+
+
+    CASE 3: right < left
+
+        The current sequence is decreasing.
+
+        - Increase dec_ans.
+        - Update ans.
+        - Reset inc_ans to 1 because the increasing
+          sequence has broken.
+        - Move j forward.
+
+
+    IMPORTANT VARIABLES:
+    ====================
+
+    i:
+        Used in your code to track a position when
+        the sequence breaks. However, it is not needed
+        for calculating the answer.
+
+    j:
+        Points to the current element being checked.
+
+    inc_ans:
+        Length of the current increasing subarray.
+
+    dec_ans:
+        Length of the current decreasing subarray.
+
+    ans:
+        Maximum monotonic subarray length found so far.
+
+
+    TIME COMPLEXITY:
+    ================
+
+    We traverse the array only once.
+
+    Time Complexity = O(n)
+
+
+    SPACE COMPLEXITY:
+    =================
+
+    We use only a few extra variables.
+
+    Auxiliary Space Complexity = O(1)
+    */
+
+
+    int longestMonotonicSubarray(vector<int>& arr) {
+
+        // Store the size of the array
+        int n = arr.size();
+
+        // If the array contains only one element,
+        // the longest monotonic subarray has length 1
+        if(n == 1){
+            return 1;
+        }
+
+        // i is used to track the position
+        // when the current sequence breaks
+        int i = 0;
+
+        // j points to the current element
+        // being compared with the previous element
+        int j = 1;
+
+        // Stores the length of the current
+        // strictly increasing subarray
+        int inc_ans = 1;
+
+        // Stores the length of the current
+        // strictly decreasing subarray
+        int dec_ans = 1;
+
+        // Stores the maximum length found so far
+        int ans = 1;
+
+
+        // Traverse the array using j
+        while(j < n){
+
+            // Previous element
+            int left = arr[j-1];
+
+            // Current element
+            int right = arr[j];
+
+
+            // CASE 1: STRICTLY INCREASING
+            if(right > left){
+
+                // Increase the length of the
+                // current increasing subarray
+                inc_ans++;
+
+                // Update the maximum length found so far
+                ans = max(ans, max(inc_ans, dec_ans));
+
+                // Decreasing sequence breaks here,
+                // so reset its counter to 1
+                dec_ans = 1;
+
+                // Move to the next element
+                j++;
+
+            }
+
+
+            // CASE 2: EQUAL ELEMENTS
+            else if(left == right){
+
+                // Equal elements break both
+                // increasing and decreasing sequences
+                inc_ans = 1;
+                dec_ans = 1;
+
+                // Move to the next element
+                j++;
+
+                // Update i to the current position
+                // after moving j forward
+                i = j;
+            }
+
+
+            // CASE 3: STRICTLY DECREASING
+            else{
+
+                // Increase the length of the
+                // current decreasing subarray
+                dec_ans++;
+
+                // Update the maximum length found so far
+                ans = max(ans, max(inc_ans, dec_ans));
+
+                // Increasing sequence breaks here,
+                // so reset its counter to 1
+                inc_ans = 1;
+
+                // Update i to the previous index
+                i = j-1;
+
+                // Move to the next element
+                j++;
+            }
+        }
+
+        // Return the maximum monotonic subarray length
+        return ans;
+    }
+};
