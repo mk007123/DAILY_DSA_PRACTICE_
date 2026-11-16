@@ -1,0 +1,162 @@
+class Solution {
+public:
+
+    /*
+    PROBLEM: COUNT GOOD SUBSTRINGS
+    =============================
+
+    APPROACH: FIXED SIZE SLIDING WINDOW + HASH MAP
+
+    PROBLEM UNDERSTANDING:
+    We are given a string str.
+
+    A good substring is a substring of length exactly 3
+    in which all three characters are distinct.
+
+    Distinct means all characters must be different.
+
+    Example:
+    str = "aababcabc"
+
+    Substrings of length 3:
+
+    "aab" -> Not good (a is repeated)
+    "aba" -> Not good (a is repeated)
+    "bab" -> Not good (b is repeated)
+    "aba" -> Not good (a is repeated)
+    "bac" -> Good (all characters are different)
+
+    The answer depends on the actual substrings formed
+    by moving the window of size 3.
+
+
+    MAIN IDEA:
+    ==========
+    We use a fixed-size sliding window of size 3.
+
+    We maintain an unordered_map to store the frequency
+    of characters in the current window.
+
+    If the map size becomes 3, it means the window contains
+    exactly 3 distinct characters.
+
+    Therefore, we found a good substring.
+
+
+    ALGORITHM:
+    ==========
+
+    STEP 1:
+    Initialize two pointers i and j at index 0.
+
+    STEP 2:
+    Create an unordered_map to store character frequencies.
+
+    STEP 3:
+    Traverse the string using pointer j.
+
+    STEP 4:
+    Add the current character str[j] to the map
+    and increase its frequency.
+
+    STEP 5:
+    When window size becomes 3:
+    - Check whether map size is 3.
+    - If yes, increment ans.
+    - Remove the leftmost character from the map.
+    - If its frequency becomes zero, erase it from the map.
+    - Move i forward.
+
+    STEP 6:
+    Move j forward and continue.
+
+    STEP 7:
+    Return ans.
+
+
+    TIME COMPLEXITY:
+    =================
+    O(n) average time.
+
+    Each character is inserted and removed from the map
+    at most once. Hash map operations take O(1) average time.
+
+    AUXILIARY SPACE:
+    ===============
+    O(1)
+
+    Since the window size is fixed at 3, the map can contain
+    at most 3 distinct characters.
+    */
+
+
+    int countGoodSubstrings(string str) {
+
+        int n = str.size(); // Size of the given string
+
+        // Example:
+        // str = "aababcabc"
+        //
+        // Windows of size 3:
+        // "aab"
+        // "aba"
+        // "bab"
+        // "aba"
+        // "bac"
+        // "aca"
+        // "cab"
+
+        int i = 0; // Starting index of the window
+        int j = 0; // Ending index of the window
+
+        int ans = 0; // Stores the total number of good substrings
+
+        // Stores the frequency of each character
+        // present in the current window.
+        unordered_map<char, int> m1;
+
+        // Traverse the string using pointer j.
+        while(j < n) {
+
+            // Current character entering the window.
+            char ch = str[j];
+
+            // Increase the frequency of this character.
+            m1[ch]++;
+
+            // Check whether the current window size is 3.
+            if(j - i + 1 == 3) {
+
+                // If map size is 3, it means the window
+                // contains exactly 3 distinct characters.
+                if(m1.size() == 3) {
+
+                    // We found a good substring.
+                    ans++;
+                }
+
+                // Store the leftmost character of the window.
+                char left = str[i];
+
+                // Move the starting pointer forward.
+                // This removes the leftmost character from the window.
+                i++;
+
+                // Decrease the frequency of the removed character.
+                m1[left]--;
+
+                // If its frequency becomes zero,
+                // remove that character from the map.
+                if(m1[left] == 0) {
+                    m1.erase(left);
+                }
+            }
+
+            // Move the ending pointer forward.
+            j++;
+        }
+
+        // Return the total number of good substrings.
+        return ans;
+    }
+};
