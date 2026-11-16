@@ -1,0 +1,213 @@
+class Solution {
+  public:
+
+    /*
+    PROBLEM: COUNT ANAGRAMS IN A STRING
+    ===================================
+
+    APPROACH 1: BRUTE FORCE + SORTING
+
+    IDEA:
+    Sort the given word first.
+    Then create every possible substring of size k from str.
+    Sort each substring and compare it with the sorted word.
+
+    If both are equal, the substring is an anagram.
+
+
+    ALGORITHM:
+    ==========
+    1. Calculate the size of str and word.
+    2. Sort word.
+    3. Use two pointers i and j to create a window of size k.
+    4. Whenever window size becomes k:
+       - Extract the substring starting from i.
+       - Sort the substring.
+       - Compare it with word.
+    5. If both are equal, increment count.
+    6. Move i forward to remove the leftmost character.
+    7. Move j forward to expand the window.
+    8. Return count.
+
+
+    TIME COMPLEXITY:
+    =================
+    O(k log k + n * k log k)
+
+    Sorting word takes O(k log k).
+    For every window, we sort a substring of size k.
+
+    AUXILIARY SPACE:
+    ===============
+    O(k) for the temporary substring.
+    */
+
+    /*
+    int search(string &word, string &str) {
+
+        int n = str.size();  // Size of the main string
+        int k = word.size(); // Size of the word
+
+        // Sort word to get a reference sorted string.
+        sort(word.begin(), word.end());
+
+        int count = 0; // Stores the total number of anagrams
+
+        int i = 0; // Starting index of the window
+        int j = 0; // Ending index of the window
+
+        // Traverse the main string.
+        while(j < n) {
+
+            // Check whether the current window size is k.
+            if(j - i + 1 == k) {
+
+                // Extract a substring of length k starting from i.
+                string temp = str.substr(i, k);
+
+                // Sort the current substring.
+                sort(temp.begin(), temp.end());
+
+                // Compare sorted substring with sorted word.
+                if(temp == word) {
+
+                    // If both are equal, we found an anagram.
+                    count++;
+                }
+
+                // Move the starting pointer forward.
+                // This removes the leftmost character from the window.
+                i++;
+            }
+
+            // Move the ending pointer forward.
+            j++;
+        }
+
+        // Return the total number of anagrams.
+        return count;
+    }
+    */
+
+
+    /*
+    APPROACH 2: OPTIMIZED APPROACH
+    ==============================
+
+    FIXED SIZE SLIDING WINDOW + FREQUENCY ARRAY
+
+    IDEA:
+    Instead of sorting every substring, we maintain the frequency
+    difference of characters using an array of size 26.
+
+    If all 26 values become zero, the current window is an anagram.
+
+
+    ALGORITHM:
+    ==========
+    1. Create a frequency array of size 26.
+    2. Store the frequency of every character of word.
+    3. Use two pointers i and j to maintain a window.
+    4. Whenever a character enters the window, decrease its frequency.
+    5. When window size becomes k:
+       - Check all 26 frequency values.
+       - If all values are zero, increment count.
+    6. Remove the leftmost character by increasing its frequency.
+    7. Move i forward.
+    8. Continue until j reaches the end of str.
+    9. Return count.
+
+
+    TIME COMPLEXITY:
+    =================
+    O(k + 26*n) = O(n + k)
+
+    AUXILIARY SPACE:
+    ===============
+    O(1), because the frequency array always has 26 elements.
+    */
+
+
+    int search(string &word, string &str) {
+
+        int n = str.size();  // Size of the main string
+        int k = word.size(); // Size of the word
+
+        // Frequency array for 26 lowercase English letters.
+        // Initially, all frequencies are 0.
+        vector<int> temp(26, 0);
+
+        // STEP 1: Store the frequency of characters in word.
+        for(int i = 0; i < k; i++) {
+
+            // Convert character into an index from 0 to 25.
+            char ch = word[i] - 'a';
+
+            // Increase the frequency of this character.
+            temp[ch]++;
+        }
+
+        int count = 0; // Stores the total number of anagrams
+
+        int i = 0; // Starting index of the window
+        int j = 0; // Ending index of the window
+
+        // Traverse the main string using pointer j.
+        while(j < n) {
+
+            // Character entering the current window.
+            char c1 = str[j];
+
+            // Convert character into an index from 0 to 25.
+            int idx = c1 - 'a';
+
+            // Decrease its frequency because this character
+            // is now included in the current window.
+            temp[idx]--;
+
+            // Check whether the current window size is k.
+            if(j - i + 1 == k) {
+
+                // Assume that the current window is an anagram.
+                bool flag = true;
+
+                // Check all 26 frequency values.
+                for(int v = 0; v < 26; v++) {
+
+                    // If even one frequency is non-zero,
+                    // the current window is not an anagram.
+                    if(temp[v] != 0) {
+
+                        flag = false;
+                        break;
+                    }
+                }
+
+                // If all frequency values are zero,
+                // the current window is an anagram.
+                if(flag) {
+                    count++;
+                }
+
+                // Remove the leftmost character from the window.
+                char left = str[i];
+
+                // Convert the outgoing character into an index.
+                int index = left - 'a';
+
+                // Restore its frequency because it is leaving
+                // the current window.
+                temp[index]++;
+
+                // Move the starting pointer forward.
+                i++;
+            }
+
+            // Move the ending pointer forward.
+            j++;
+        }
+
+        // Return the total number of anagrams.
+        return count;
+    }
+};
