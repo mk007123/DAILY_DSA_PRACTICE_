@@ -1,0 +1,143 @@
+class Solution {
+public:
+
+    /*
+    PROBLEM: MAXIMUM NUMBER OF VOWELS IN A SUBSTRING OF SIZE K
+    ==========================================================
+
+    APPROACH: FIXED SIZE SLIDING WINDOW
+
+    PROBLEM UNDERSTANDING:
+    We are given a string str and an integer k.
+
+    We need to find the maximum number of vowels present in
+    any contiguous substring of length k.
+
+    Vowels are: a, e, i, o, u.
+
+    Example:
+    str = "abciiidef"
+    k = 3
+
+    Substrings of size 3:
+    "abc" -> 1 vowel
+    "bci" -> 1 vowel
+    "cii" -> 2 vowels
+    "iii" -> 3 vowels
+    "ide" -> 2 vowels
+    "def" -> 1 vowel
+
+    Answer = 3
+
+
+    MAIN IDEA:
+    ==========
+    We use a fixed-size sliding window of size k.
+
+    Instead of counting vowels again in every substring,
+    we maintain a variable count.
+
+    - When a vowel enters the window, increase count.
+    - When a vowel leaves the window, decrease count.
+    - Update ans whenever the window size becomes k.
+
+
+    ALGORITHM:
+    ==========
+
+    STEP 1:
+    Initialize two pointers i and j at index 0.
+
+    STEP 2:
+    Traverse the string using pointer j.
+
+    STEP 3:
+    Check whether the current character str[j] is a vowel.
+    If yes, increase count.
+
+    STEP 4:
+    When the window size becomes k:
+    - Update ans with the maximum value of ans and count.
+    - Remove the leftmost character from the window.
+    - If that character is a vowel, decrease count.
+    - Move i forward.
+
+    STEP 5:
+    Move j forward and continue.
+
+    STEP 6:
+    Return ans.
+
+
+    TIME COMPLEXITY:
+    =================
+    O(n)
+
+    We traverse the string only once.
+    Each character is processed a constant number of times.
+
+
+    AUXILIARY SPACE:
+    ===============
+    O(1)
+
+    We use only a few variables.
+    */
+
+
+    int maxVowels(string str, int k) {
+
+        int n = str.size(); // Size of the string
+
+        int i = 0; // Starting index of the window
+        int j = 0; // Ending index of the window
+
+        int ans = 0;   // Stores the maximum number of vowels
+        int count = 0; // Stores the number of vowels in the current window
+
+        // Traverse the string using pointer j.
+        while(j < n) {
+
+            // Current character entering the window.
+            char ch = str[j];
+
+            // Check whether the current character is a vowel.
+            if(ch == 'a' || ch == 'e' || ch == 'i' ||
+               ch == 'o' || ch == 'u') {
+
+                // Increase vowel count because a vowel
+                // has entered the current window.
+                count++;
+            }
+
+            // Check whether the current window size has become k.
+            if(j - i + 1 == k) {
+
+                // Update the maximum number of vowels found so far.
+                ans = max(ans, count);
+
+                // Store the leftmost character before removing it.
+                char left = str[i];
+
+                // Move the starting pointer forward.
+                // This removes the leftmost character from the window.
+                i++;
+
+                // Check whether the removed character was a vowel.
+                if(left == 'a' || left == 'e' || left == 'i' ||
+                   left == 'o' || left == 'u') {
+
+                    // Decrease count because this vowel
+                    // is no longer part of the current window.
+                    count--;
+                }
+            }
+
+            // Move the ending pointer forward.
+            j++;
+        }
+
+        // Return the maximum number of vowels in any window of size k.
+        return ans;
+    }
+};
