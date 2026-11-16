@@ -1,0 +1,150 @@
+class Solution {
+public:
+
+    /*
+    PROBLEM: SLIDING WINDOW MAXIMUM
+    ==============================
+
+    APPROACH: FIXED SIZE SLIDING WINDOW + MONOTONIC DEQUE
+
+    PROBLEM UNDERSTANDING:
+    We are given an array arr and an integer k.
+
+    We need to find the maximum element in every contiguous
+    subarray (window) of size k.
+
+    Example:
+    arr = [1,3,-1,-3,5,3,6,7]
+    k = 3
+
+    Windows:
+    [1,3,-1]  -> Maximum = 3
+    [3,-1,-3] -> Maximum = 3
+    [-1,-3,5] -> Maximum = 5
+    [-3,5,3]  -> Maximum = 5
+    [5,3,6]   -> Maximum = 6
+    [3,6,7]   -> Maximum = 7
+
+    Answer = [3,3,5,5,6,7]
+
+
+    MAIN IDEA:
+    ==========
+    We use a deque to efficiently maintain the maximum element
+    of every window.
+
+    IMPORTANT:
+    We store INDICES in the deque, not actual array elements.
+
+    The deque maintains indices in decreasing order of their
+    corresponding array values.
+
+    This means:
+    - The front always contains the index of the maximum element.
+    - Smaller elements are removed from the back when a greater
+      element enters the window.
+
+
+    ALGORITHM:
+    ==========
+
+    STEP 1:
+    Traverse the array using pointer j.
+
+    STEP 2:
+    Take the current element arr[j].
+
+    STEP 3:
+    Remove smaller elements from the BACK of the deque.
+
+    Why?
+    Because the current element is greater than those elements
+    and appears after them. Therefore, those smaller elements
+    cannot become the maximum while the current element is present.
+
+    STEP 4:
+    Insert the current index j into the deque.
+
+    STEP 5:
+    Remove indices from the FRONT that are outside the current window.
+
+    STEP 6:
+    When window size becomes k:
+    - The front of the deque contains the index of the maximum.
+    - Add that maximum element to the answer.
+    - Move i forward to slide the window.
+
+    STEP 7:
+    Move j forward and repeat the process.
+
+
+    TIME COMPLEXITY:
+    =================
+    O(n)
+
+    Every index enters the deque once and is removed at most once.
+
+    AUXILIARY SPACE:
+    ===============
+    O(k)
+
+    In the worst case, the deque can store k indices.
+    */
+
+
+    vector<int> maxSlidingWindow(vector<int>& arr, int k) {
+
+        int n = arr.size();
+
+        int i = 0; // Starting index of the current window
+        int j = 0; // Ending index of the current window
+
+        vector<int> ans; // Stores maximum element of every window
+
+        // Deque stores indices in decreasing order
+        // of their corresponding array values.
+        deque<int> q1;
+
+        // Traverse the entire array using pointer j.
+        while(j < n) {
+
+            // Current element entering the window.
+            int ele = arr[j];
+
+            // STEP 1: Remove smaller elements from the BACK.
+            // If the current element is greater than the element
+            // at the back, remove that smaller element.
+            while(q1.size() && ele > arr[q1.back()]) {
+                q1.pop_back();
+            }
+
+            // STEP 2: Insert the current index into the deque.
+            q1.push_back(j);
+
+            // STEP 3: Remove indices that are outside the window.
+            // The current window starts at index i.
+            // An index <= j-k is outside the current window.
+            while(q1.size() && q1.front() <= j-k) {
+                q1.pop_front();
+            }
+
+            // STEP 4: Check whether the window size has become k.
+            if(j-i+1 == k) {
+
+                // The front contains the index of the maximum element.
+                // Add that maximum element to the answer.
+                ans.push_back(arr[q1.front()]);
+
+                // Move the starting pointer forward.
+                // This slides the window to the right.
+                i++;
+            }
+
+            // Move the ending pointer forward.
+            j++;
+        }
+
+        // Return the maximum element of every window.
+        return ans;
+    }
+};
