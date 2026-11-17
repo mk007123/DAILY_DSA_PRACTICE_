@@ -1,0 +1,182 @@
+/*
+PROBLEM:
+LeetCode 3875 - Construct Uniform Parity Array I
+
+PROBLEM UNDERSTANDING:
+We are given an array nums1 containing n distinct integers.
+
+We need to construct another array nums2 of the same length
+such that all elements of nums2 have the same parity.
+
+This means either:
+1. All elements of nums2 must be EVEN.
+2. All elements of nums2 must be ODD.
+
+For every index i, we have exactly two choices:
+
+1. Keep the original element:
+   nums2[i] = nums1[i]
+
+2. Subtract another element from the original array:
+   nums2[i] = nums1[i] - nums1[j], where j != i.
+
+We can choose either operation independently for every index.
+
+We need to return true if such an array can be constructed,
+otherwise return false.
+
+------------------------------------------------------------
+
+IMPORTANT CONCEPT: PARITY
+
+Parity means whether a number is EVEN or ODD.
+
+1. Even number: Divisible by 2.
+   Example: 2, 4, 6, 8
+
+2. Odd number: Not divisible by 2.
+   Example: 1, 3, 5, 7
+
+IMPORTANT RULES:
+
+A. Subtracting an EVEN number does not change parity.
+
+   Even - Even = Even
+   Odd  - Even = Odd
+
+   Therefore:
+   x - Even = Same parity as x.
+
+B. Subtracting an ODD number changes parity.
+
+   Even - Odd = Odd
+   Odd  - Odd = Even
+
+   Therefore:
+   x - Odd = Opposite parity of x.
+
+------------------------------------------------------------
+
+APPROACH: MATHEMATICAL OBSERVATION
+
+We can prove that the answer is ALWAYS TRUE.
+
+There are two possible cases:
+
+CASE 1: ALL ELEMENTS HAVE THE SAME PARITY
+
+Example:
+nums1 = {2, 4, 6, 8}
+
+All elements are already EVEN.
+
+We can simply choose option 1 for every index,
+which means keeping all original elements unchanged.
+
+Our nums2 becomes:
+nums2 = {2, 4, 6, 8}
+
+All elements are EVEN.
+
+Similarly, if all elements are ODD,
+we can keep all elements unchanged.
+
+Therefore, this case is always possible.
+
+------------------------------------------------------------
+
+CASE 2: ARRAY CONTAINS BOTH ODD AND EVEN ELEMENTS
+
+Example:
+nums1 = {2, 3, 4, 5}
+
+Here, we have:
+Even elements = 2, 4
+Odd elements  = 3, 5
+
+Our target is to make every element ODD.
+
+STEP 1:
+Choose any one ODD element from the array.
+
+Let's choose 3.
+
+STEP 2:
+For every ODD element, keep it unchanged.
+
+3 remains 3 (ODD).
+5 remains 5 (ODD).
+
+STEP 3:
+For every EVEN element, subtract the chosen ODD element (3).
+
+2 - 3 = -1 (ODD).
+4 - 3 = 1  (ODD).
+
+Why does this work?
+
+Because:
+EVEN - ODD = ODD.
+
+Our final nums2 becomes:
+
+nums2 = {-1, 3, 1, 5}
+
+Now, every element is ODD.
+
+IMPORTANT:
+The chosen odd element is different from every even element,
+so the condition j != i is satisfied.
+
+Therefore, this case is also always possible.
+
+------------------------------------------------------------
+
+FINAL OBSERVATION:
+
+Whether:
+1. All elements are already even.
+2. All elements are already odd.
+3. The array contains both odd and even elements.
+
+We can ALWAYS construct an array with uniform parity.
+
+Therefore, we do not even need to traverse the array.
+
+We can directly return true.
+
+------------------------------------------------------------
+
+TIME COMPLEXITY:
+O(1)
+
+Reason:
+We are directly returning true without traversing the array.
+
+AUXILIARY SPACE:
+O(1)
+
+Reason:
+We are not using any additional data structure or extra space.
+*/
+
+class Solution {
+public:
+    bool uniformArray(vector<int>& arr) {
+
+        // A valid array with all elements having the same parity
+        // can always be constructed.
+
+        // If all elements already have the same parity,
+        // simply keep every element unchanged.
+
+        // If both odd and even elements exist:
+        // 1. Choose any odd element from the array.
+        // 2. Keep all odd elements unchanged.
+        // 3. For every even element, subtract the chosen odd element.
+        // 4. Even - Odd = Odd, so every resulting element becomes odd.
+
+        // Thus, a valid nums2 can always be constructed.
+        return true;
+    }
+};
