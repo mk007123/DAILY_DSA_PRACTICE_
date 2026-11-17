@@ -1,0 +1,240 @@
+/*
+PROBLEM:
+LeetCode 3876 - Construct Uniform Parity Array II
+
+PROBLEM UNDERSTANDING:
+
+We are given an array nums1 containing n distinct integers.
+
+We have to construct another array nums2 of the same length
+such that all elements of nums2 have the same parity.
+
+This means either:
+1. All elements must be EVEN.
+2. All elements must be ODD.
+
+For every index i, we have exactly two choices:
+
+1. Keep the original element:
+   nums2[i] = nums1[i]
+
+2. Subtract another element:
+   nums2[i] = nums1[i] - nums1[j]
+
+   Here, j must be different from i.
+
+IMPORTANT CONDITION:
+The subtraction result must be greater than or equal to 1.
+
+------------------------------------------------------------
+
+IMPORTANT PARITY RULES:
+
+1. Even - Even = Even
+2. Odd - Odd = Even
+3. Even - Odd = Odd
+4. Odd - Even = Odd
+
+Therefore:
+
+x - ODD  = Parity changes.
+x - EVEN = Parity remains the same.
+
+However, we must also ensure that the subtraction result
+is positive.
+
+------------------------------------------------------------
+
+APPROACH:
+Mathematical Observation + Minimum Element
+
+ALGORITHM:
+
+STEP 1:
+Check whether the array contains at least one ODD element.
+
+If no odd element exists, all elements are EVEN.
+
+We can simply keep all elements unchanged.
+Therefore, return true.
+
+STEP 2:
+Check whether the array contains at least one EVEN element.
+
+If no even element exists, all elements are ODD.
+
+We can simply keep all elements unchanged.
+Therefore, return true.
+
+STEP 3:
+Now we know that the array contains BOTH odd and even elements.
+
+Find the minimum element of the array.
+
+There are two possibilities:
+
+CASE A: Minimum element is ODD.
+
+We can make all elements ODD.
+
+1. Keep every odd element unchanged.
+2. For every even element, subtract the minimum odd element.
+
+Why does this work?
+
+The minimum element is odd, and every even element
+must be greater than it because all elements are distinct.
+
+Therefore, the subtraction is always positive.
+
+Also:
+
+EVEN - ODD = ODD.
+
+Hence, all resulting elements become ODD.
+
+Return true.
+
+CASE B: Minimum element is EVEN.
+
+We cannot construct a valid array.
+
+Why?
+
+Consider the smallest ODD element in the array.
+
+1. We cannot keep it unchanged because we want all elements
+   to have the same parity as the even elements.
+2. We cannot subtract a smaller ODD element because no such
+   element exists. Otherwise, that smaller odd element would
+   be the minimum of the entire array, which is even.
+3. Subtracting an EVEN number does not change its parity.
+4. Subtracting a larger number is not allowed because the
+   result would be less than 1.
+
+Therefore, the smallest odd element cannot be converted
+into an even number.
+
+Return false.
+
+------------------------------------------------------------
+
+TIME COMPLEXITY:
+
+O(n)
+
+1. First loop checks for an odd element: O(n).
+2. Second loop checks for an even element: O(n).
+3. min_element() finds the minimum element: O(n).
+
+Total = O(n) + O(n) + O(n) = O(n).
+
+AUXILIARY SPACE:
+
+O(1)
+
+We are using only a few variables and no extra data structure.
+*/
+
+class Solution {
+public:
+    bool uniformArray(vector<int>& arr) {
+
+        // Get the total number of elements in the array
+        int n = arr.size();
+
+        // ------------------------------------------------
+        // STEP 1: Check whether at least one ODD element exists
+        // ------------------------------------------------
+
+        int i = 0;
+
+        for (; i < n; i++) {
+
+            // Get the current element
+            int ele = arr[i];
+
+            // If ele % 2 == 1, the element is ODD
+            // We have found at least one odd element
+            if (ele % 2 == 1) {
+                break;
+            }
+        }
+
+        // If i reaches n, it means no odd element was found.
+        // Therefore, all elements are EVEN.
+        // We can keep every element unchanged.
+        if (i == n) {
+            return true;
+        }
+
+        // ------------------------------------------------
+        // STEP 2: Check whether at least one EVEN element exists
+        // ------------------------------------------------
+
+        int j = 0;
+
+        for (; j < n; j++) {
+
+            // Get the current element
+            int ele = arr[j];
+
+            // If ele % 2 == 0, the element is EVEN
+            // We have found at least one even element
+            if (ele % 2 == 0) {
+                break;
+            }
+        }
+
+        // If j reaches n, it means no even element was found.
+        // Therefore, all elements are ODD.
+        // We can keep every element unchanged.
+        if (j == n) {
+            return true;
+        }
+
+        // ------------------------------------------------
+        // STEP 3: Both ODD and EVEN elements exist.
+        // Now find the smallest element in the array.
+        // ------------------------------------------------
+
+        // min_element() returns an iterator pointing to
+        // the smallest element.
+        // * is used to get the actual value.
+        int mini = *min_element(arr.begin(), arr.end());
+
+        // ------------------------------------------------
+        // STEP 4: Check the parity of the minimum element
+        // ------------------------------------------------
+
+        // If the minimum element is EVEN,
+        // it is impossible to construct a uniform parity array.
+
+        // Reason:
+        // Consider the smallest ODD element.
+        // There cannot be any smaller ODD element to subtract
+        // from it, because the minimum element of the entire
+        // array is EVEN.
+
+        // Subtracting an EVEN number does not change parity.
+        // Subtracting a larger number would give a result < 1.
+
+        if (mini % 2 == 0) {
+            return false;
+        }
+
+        // If the minimum element is ODD:
+        // Keep all ODD elements unchanged.
+        // Subtract this minimum ODD element from every EVEN element.
+        //
+        // Every EVEN element is greater than mini because
+        // all array elements are distinct.
+        //
+        // EVEN - ODD = ODD.
+        // Also, every subtraction result is positive.
+        //
+        // Therefore, all elements can be made ODD.
+
+        return true;
+    }
+};
