@@ -1,0 +1,20 @@
+class Solution {
+    public int minimizeSum(int[] arr) {
+
+        int n = arr.length;
+
+        Arrays.sort(arr);
+
+    
+
+        int op1 = arr[n-3] - arr[0];
+
+        // last 2 same
+        int op2 = arr[n-1] - arr[2];
+
+        // first 2
+        int op3 = arr[n-2] - arr[1];
+
+        return Math.min(Math.min(op1, op2), op3);
+    }
+}
