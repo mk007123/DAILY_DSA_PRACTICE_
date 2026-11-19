@@ -1,0 +1,72 @@
+```java
+/*
+    APPROACH:
+
+    We are allowed to perform at most 3 operations.
+
+    In each operation, we can change any element to any value.
+
+    Our goal is to minimise the difference between the
+    maximum and minimum elements of the array.
+
+    IDEA:
+
+    1. First, sort the array in ascending order.
+
+    2. After sorting, the smallest elements are on the left
+       and the largest elements are on the right.
+
+    3. Since we have 3 operations, we can change at most
+       3 extreme elements to bring the difference down.
+
+    4. We have 4 possible ways to distribute these 3 operations:
+
+       Case 1: Change the 3 smallest elements.
+       Case 2: Change 1 smallest and 2 largest elements.
+       Case 3: Change 2 smallest and 1 largest element.
+       Case 4: Change the 3 largest elements.
+
+    5. Calculate the remaining difference for all 4 cases.
+
+    6. Return the minimum among these 4 differences.
+
+    TIME COMPLEXITY: O(n log n) because of sorting.
+    SPACE COMPLEXITY: O(log n) auxiliary space for sorting.
+*/
+
+class Solution {
+    public int minDifference(int[] arr) {
+
+        // Store the size of the array
+        int n = arr.length;
+
+        // If the array has at most 3 elements,
+        // we can make all elements equal in 3 operations
+        if (n == 1 || n == 2 || n == 3) {
+            return 0;
+        }
+
+        // Sort the array in ascending order
+        Arrays.sort(arr);
+
+        // Case 1: Change the 3 smallest elements
+        // Remaining elements are from index 3 to n-1
+        int op1 = arr[n-1] - arr[3];
+
+        // Case 2: Change 1 smallest and 2 largest elements
+        // Remaining elements are from index 1 to n-3
+        int op2 = arr[n-3] - arr[1];
+
+        // Case 3: Change 2 smallest and 1 largest element
+        // Remaining elements are from index 2 to n-2
+        int op3 = arr[n-2] - arr[2];
+
+        // Case 4: Change the 3 largest elements
+        // Remaining elements are from index 0 to n-4
+        int op4 = arr[n-4] - arr[0];
+
+        // Return the minimum difference among all 4 cases
+        return Math.min(Math.min(op1, op2), Math.min(op3, op4));
+    }
+}
+```
