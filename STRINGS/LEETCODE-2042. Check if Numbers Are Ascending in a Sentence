@@ -1,0 +1,93 @@
+class Solution {
+    public boolean areNumbersAscending(String str) {
+
+        // PROBLEM:
+        // We are given a sentence containing words and numbers.
+        // We have to check whether all the numbers in the sentence
+        // are strictly increasing from left to right.
+        //
+        // Example:
+        // "hello 12 box 34 56" -> true
+        // "hello 12 box 34 20" -> false
+        //
+        // APPROACH:
+        // 1. Traverse the string character by character.
+        // 2. Whenever we encounter a digit, start extracting the number.
+        // 3. Keep adding characters to temp until we encounter a space
+        //    or reach the end of the string.
+        // 4. Convert the extracted String into an integer.
+        // 5. Compare it with the previous number (last).
+        // 6. If the current number is not greater than last, return false.
+        // 7. Otherwise, update last and continue.
+        //
+        // VARIABLES:
+        // n    -> Length of the input string.
+        // temp -> Stores the digits of the current number as a String.
+        // last -> Stores the previously extracted number.
+        // ch   -> Stores the current character.
+        // num  -> Stores the extracted number after converting it to int.
+
+        int n = str.length();
+
+        String temp = "";
+
+        // Initially, no number has been extracted.
+        // We use -1 because the numbers in the problem are positive.
+        int last = -1;
+
+        // Traverse the entire string.
+        for (int i = 0; i < n; i++) {
+
+            // Get the current character.
+            char ch = str.charAt(i);
+
+            // Check whether the current character is a digit (0 to 9).
+            if (ch == '0' || ch == '1' || ch == '2' ||
+                ch == '3' || ch == '4' || ch == '5' ||
+                ch == '6' || ch == '7' || ch == '8' ||
+                ch == '9') {
+
+                // We have found the starting digit of a number.
+                // Now extract the complete number.
+
+                // Continue until we encounter a space or reach the
+                // end of the string.
+                while (i < n && str.charAt(i) != ' ') {
+
+                    // Add the current digit to temp.
+                    temp = temp + str.charAt(i);
+
+                    // Move to the next character.
+                    i++;
+                }
+
+                // Convert the extracted String into an integer.
+                // Example: "123" becomes 123.
+                int num = Integer.parseInt(temp);
+
+                // Check whether the current number is strictly
+                // greater than the previously extracted number.
+                if (num > last) {
+
+                    // Current number is valid.
+                    // Update last with the current number.
+                    last = num;
+                }
+                else {
+
+                    // Current number is either smaller than or
+                    // equal to the previous number.
+                    // Therefore, the numbers are not strictly increasing.
+                    return false;
+                }
+
+                // Clear temp so that it can store the next number.
+                temp = "";
+            }
+        }
+
+        // If we successfully traverse the entire string without
+        // finding any invalid comparison, return true.
+        return true;
+    }
+}
