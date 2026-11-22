@@ -1,0 +1,295 @@
+class Solution {
+
+    /*
+    PROBLEM: MAXIMUM POINTS YOU CAN OBTAIN FROM CARDS
+    =================================================
+
+    APPROACH: FIXED SIZE SLIDING WINDOW
+
+
+    PROBLEM UNDERSTANDING:
+    ======================
+
+    We are given an integer array arr and an integer pick.
+
+    We have to select exactly 'pick' elements from either:
+    - The beginning (left side) of the array.
+    - The end (right side) of the array.
+
+    We need to maximize the sum of the selected elements.
+
+    Example:
+
+    arr = [1, 2, 3, 4, 5, 6, 1]
+    pick = 3
+
+    We have to select exactly 3 elements.
+
+    Some possible selections:
+
+    Left 3 elements:  [1, 2, 3] -> Sum = 6
+
+    Right 3 elements: [5, 6, 1] -> Sum = 12
+
+    2 from left and 1 from right: [1, 2, 1] -> Sum = 4
+
+    Maximum possible answer = 12
+
+
+    MAIN IDEA:
+    ==========
+
+    Instead of directly selecting elements from both ends,
+    we use a different approach.
+
+    We know that:
+
+    Maximum Selected Sum = Total Sum - Minimum Unselected Sum
+
+    Suppose:
+    - Total number of elements = n
+    - Number of elements to select = pick
+
+    Then:
+
+    Number of elements NOT selected = n - pick
+
+    These unselected elements will always form one contiguous
+    subarray in the middle of the array.
+
+    Therefore, our task becomes:
+
+    Find the minimum sum of a contiguous subarray
+    having exactly (n - pick) elements.
+
+    We can solve this using a FIXED SIZE SLIDING WINDOW.
+
+
+    WHY DOES THIS WORK?
+    ===================
+
+    We can select elements only from the beginning or the end.
+
+    This means we cannot leave some random elements unselected.
+
+    All the elements that we do not select must be together
+    in one continuous block.
+
+    For example:
+
+    arr = [1, 2, 3, 4, 5, 6, 1]
+    pick = 3
+
+    n = 7
+    k = n - pick = 4
+
+    Suppose we leave these 4 elements unselected:
+
+    [1, 2, 3, 4, 5, 6, 1]
+        |-------|
+        Unselected
+
+    We select:
+    - 1 from the beginning.
+    - 2 from the end.
+
+    Selected sum = 1 + 6 + 1 = 8
+
+    Instead of checking every possible selection,
+    we find the minimum sum subarray of size 4.
+
+
+    SLIDING WINDOW VARIABLES:
+    ========================
+
+    i:
+    Starting index of the current window.
+
+    j:
+    Ending index of the current window.
+
+    k:
+    Required window size = n - pick.
+
+    window_sum:
+    Stores the sum of elements in the current window.
+
+    mini:
+    Stores the minimum window sum found so far.
+
+    total:
+    Stores the sum of all elements of the array.
+
+
+    ALGORITHM:
+    ==========
+
+    STEP 1:
+    Calculate the total sum of the array.
+
+    STEP 2:
+    Calculate k = n - pick.
+
+    This represents the number of elements that we
+    are NOT going to select.
+
+    STEP 3:
+    If k == 0, it means pick == n.
+
+    We have to select all elements, so return total.
+
+    STEP 4:
+    Initialize two pointers i and j at index 0.
+
+    STEP 5:
+    Traverse the array using pointer j.
+
+    Add arr[j] to window_sum because this element
+    is entering the current window.
+
+    STEP 6:
+    Check whether the current window size becomes k.
+
+    Window size = j - i + 1
+
+    If the window size becomes k:
+
+    - Update mini with the minimum of mini and window_sum.
+    - Store arr[i] in left.
+    - Remove arr[i] from window_sum.
+    - Move i forward.
+
+    STEP 7:
+    Move j forward and continue processing the array.
+
+    STEP 8:
+    After checking all windows, we have the minimum
+    sum subarray of size k.
+
+    STEP 9:
+    Calculate the final answer:
+
+    Answer = total - mini
+
+    Return the answer.
+
+
+    TIME COMPLEXITY:
+    ================
+
+    O(n)
+
+    - First loop calculates the total sum: O(n).
+    - Sliding window traverses the array: O(n).
+
+    Overall: O(n) + O(n) = O(n).
+
+
+    AUXILIARY SPACE:
+    ================
+
+    O(1)
+
+    We use only a few variables.
+
+    No extra array or data structure is required.
+    */
+
+
+    public int maxScore(int[] arr, int pick) {
+
+        int n = arr.length; // Total number of elements in the array.
+
+        // Number of elements that we do NOT need to select.
+        // These elements will form one continuous subarray.
+        int k = n - pick;
+
+        int i = 0; // Starting index of the sliding window.
+        int j = 0; // Ending index of the sliding window.
+
+        int mini = Integer.MAX_VALUE;
+        // Stores the minimum sum of any window of size k.
+
+        int window_sum = 0;
+        // Stores the sum of elements in the current window.
+
+        int total = 0;
+        // Stores the sum of all elements in the array.
+
+
+        // Calculate the total sum of the array.
+        for(int a = 0; a < n; a++) {
+
+            // Add the current element to the total sum.
+            total += arr[a];
+        }
+
+
+        // If k == 0, it means pick == n.
+        // We have to select all elements of the array.
+        // Therefore, the answer is simply the total sum.
+        if(k == 0) {
+
+            return total;
+        }
+
+
+        // Traverse the array using pointer j.
+        while(j < n) {
+
+            // Current element entering the sliding window.
+            int ele = arr[j];
+
+            // Add the current element to the window sum
+            // because arr[j] is now part of the window.
+            window_sum += ele;
+
+
+            // Check whether the current window size has become k.
+            //
+            // Window size = j - i + 1
+            //
+            // If it becomes k, we have found one complete
+            // subarray of the required size.
+            if(j - i + 1 == k) {
+
+                // Update mini with the minimum sum found so far.
+                //
+                // If the current window sum is smaller than mini,
+                // update mini.
+                //
+                // Otherwise, keep the previous minimum.
+                mini = Math.min(mini, window_sum);
+
+
+                // Store the leftmost element before removing it.
+                int left = arr[i];
+
+                // Remove the leftmost element from window_sum.
+                //
+                // We remove it because we want to move the
+                // window forward and consider the next subarray.
+                window_sum -= left;
+
+
+                // Move the starting pointer forward.
+                // This removes the leftmost element from the window.
+                i++;
+            }
+
+
+            // Move the ending pointer forward.
+            // The next element will enter the window.
+            j++;
+        }
+
+
+        // We have now found the minimum sum subarray of size k.
+        //
+        // Maximum Selected Sum =
+        // Total Sum - Minimum Unselected Sum
+        //
+        // Therefore, subtract mini from total and return the answer.
+        return total - mini;
+    }
+}
