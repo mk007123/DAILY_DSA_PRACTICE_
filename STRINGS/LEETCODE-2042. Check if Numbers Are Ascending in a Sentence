@@ -1,4 +1,5 @@
 class Solution {
+
     public boolean areNumbersAscending(String str) {
 
         // PROBLEM:
@@ -13,81 +14,88 @@ class Solution {
         // APPROACH:
         // 1. Traverse the string character by character.
         // 2. Whenever we encounter a digit, start extracting the number.
-        // 3. Keep adding characters to temp until we encounter a space
-        //    or reach the end of the string.
-        // 4. Convert the extracted String into an integer.
-        // 5. Compare it with the previous number (last).
-        // 6. If the current number is not greater than last, return false.
-        // 7. Otherwise, update last and continue.
+        // 3. Use StringBuilder to store all digits of the current number.
+        // 4. Continue extracting until we encounter a space or reach the end.
+        // 5. Convert the extracted StringBuilder into a String and then int.
+        // 6. Compare the current number with the previously extracted number.
+        // 7. If current number is not greater, return false.
+        // 8. Otherwise, update last and continue.
         //
         // VARIABLES:
         // n    -> Length of the input string.
-        // temp -> Stores the digits of the current number as a String.
+        // temp -> StringBuilder that stores digits of the current number.
         // last -> Stores the previously extracted number.
         // ch   -> Stores the current character.
-        // num  -> Stores the extracted number after converting it to int.
+        // num  -> Stores the extracted number as an integer.
 
         int n = str.length();
 
-        String temp = "";
+        // StringBuilder is used instead of String because
+        // StringBuilder allows us to append characters efficiently.
+        // Unlike String, it does not create a new object every time.
+        StringBuilder temp = new StringBuilder();
 
         // Initially, no number has been extracted.
-        // We use -1 because the numbers in the problem are positive.
+        // We use -1 because all numbers in the problem are positive.
         int last = -1;
 
-        // Traverse the entire string.
+        // Traverse the input string from left to right.
         for (int i = 0; i < n; i++) {
 
-            // Get the current character.
+            // Get the character at the current index.
             char ch = str.charAt(i);
 
-            // Check whether the current character is a digit (0 to 9).
+            // Check whether the current character is a digit.
+            // If it is a digit, we have found the starting point
+            // of a number.
             if (ch == '0' || ch == '1' || ch == '2' ||
                 ch == '3' || ch == '4' || ch == '5' ||
                 ch == '6' || ch == '7' || ch == '8' ||
                 ch == '9') {
 
-                // We have found the starting digit of a number.
-                // Now extract the complete number.
-
-                // Continue until we encounter a space or reach the
-                // end of the string.
+                // Extract the complete number.
+                // Continue until we encounter a space or reach
+                // the end of the string.
                 while (i < n && str.charAt(i) != ' ') {
 
-                    // Add the current digit to temp.
-                    temp = temp + str.charAt(i);
+                    // Append the current character to StringBuilder.
+                    // Example: '1', '2', '3' become "123".
+                    temp.append(str.charAt(i));
 
                     // Move to the next character.
                     i++;
                 }
 
-                // Convert the extracted String into an integer.
+                // Convert StringBuilder into a normal String using toString().
+                // Then convert that String into an integer using parseInt().
                 // Example: "123" becomes 123.
-                int num = Integer.parseInt(temp);
+                int num = Integer.parseInt(temp.toString());
 
                 // Check whether the current number is strictly
                 // greater than the previously extracted number.
                 if (num > last) {
 
                     // Current number is valid.
-                    // Update last with the current number.
+                    // Update last so that it stores the current number
+                    // for comparison with the next extracted number.
                     last = num;
                 }
                 else {
 
-                    // Current number is either smaller than or
-                    // equal to the previous number.
+                    // Current number is smaller than or equal to last.
                     // Therefore, the numbers are not strictly increasing.
                     return false;
                 }
 
-                // Clear temp so that it can store the next number.
-                temp = "";
+                // Clear StringBuilder.
+                // setLength(0) removes all previously stored characters.
+                // This allows temp to store the next number.
+                temp.setLength(0);
             }
         }
 
-        // If we successfully traverse the entire string without
-        // finding any invalid comparison, return true.
+        // If the entire string is traversed without finding
+        // any invalid comparison, all numbers are strictly increasing.
         return true;
     }
 }
