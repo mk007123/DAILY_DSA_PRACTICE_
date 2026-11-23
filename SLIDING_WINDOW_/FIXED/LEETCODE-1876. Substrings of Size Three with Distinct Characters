@@ -1,13 +1,199 @@
+Comparison of all three approaches
+Feature	               Approach 1	                              Approach 2	                       Approach 3
+Technique	           Sliding Window	                         Direct Comparison	                  Sliding Window
+Data structure	          ArrayList	                                  None	                             HashMap
+Window size                3  	                                       3                                    3
+Time complexity	          O(26n)	                                  O(n)	                               O(n) average
+Space complexity	       O(1)	                                      O(1)	                               O(1)
+Beginner friendly	       Yes	                                      Very easy	                            Yes
+
+
 class Solution {
-public:
 
     /*
     PROBLEM: COUNT GOOD SUBSTRINGS
     =============================
 
-    APPROACH: FIXED SIZE SLIDING WINDOW + HASH MAP
+    APPROACH 1: DIRECT CHARACTER COMPARISON
+
 
     PROBLEM UNDERSTANDING:
+    ======================
+
+    We are given a string str.
+
+    We need to count the number of substrings of length exactly 3
+    in which all three characters are distinct.
+
+    Example:
+
+    str = "aababcabc"
+
+    Substrings of length 3:
+
+    "aab" -> Not good
+    "aba" -> Not good
+    "bab" -> Not good
+    "aba" -> Not good
+    "bac" -> Good
+    "aca" -> Not good
+    "cab" -> Good
+
+    Answer = 2
+
+
+    MAIN IDEA:
+    ==========
+
+    Since the required substring size is exactly 3,
+    we do not need a frequency array or a HashMap.
+
+    We can directly compare the three characters.
+
+    Consider a substring:
+
+    str[i-1], str[i], str[i+1]
+
+    For all three characters to be distinct,
+    the following three conditions must be satisfied:
+
+    1. Current character != Previous character
+    2. Current character != Next character
+    3. Previous character != Next character
+
+    If all three conditions are true,
+    we have found a good substring.
+
+    Therefore, increase ans.
+
+
+    WHY DO WE START i FROM 1?
+    =========================
+
+    We are accessing three characters:
+
+    Previous character = str[i-1]
+    Current character  = str[i]
+    Next character     = str[i+1]
+
+    If i starts from 0, str[i-1] will be invalid.
+
+    Therefore, we start i from 1.
+
+    Also, we need i+1 to be within the string.
+
+    The last valid value of i is n-2.
+
+    Therefore, the loop runs from:
+
+    i = 1 to i <= n-2
+
+
+    ALGORITHM:
+    ==========
+
+    STEP 1:
+    Calculate the length of the string.
+
+    STEP 2:
+    Initialize ans = 0.
+
+    STEP 3:
+    Traverse the string using a for loop from i = 1 to n-2.
+
+    STEP 4:
+    Store the three characters:
+    - prev = str[i-1]
+    - curr = str[i]
+    - next = str[i+1]
+
+    STEP 5:
+    Check all three pairwise comparisons:
+
+    curr != prev
+    curr != next
+    prev != next
+
+    STEP 6:
+    If all conditions are true, increment ans.
+
+    STEP 7:
+    Return ans.
+
+
+    TIME COMPLEXITY:
+    ================
+
+    O(n)
+
+    We traverse the string once.
+
+    Each iteration performs only three character comparisons,
+    which take constant time.
+
+
+    AUXILIARY SPACE:
+    ================
+
+    O(1)
+
+    We use only a few variables.
+
+    No extra data structure is required.
+    */
+
+
+    public int countGoodSubstrings(String str) {
+
+        int n = str.length(); // Length of the string
+
+        int ans = 0; // Stores the total number of good substrings
+
+        // Traverse the string.
+        // We start from index 1 because we need a previous character.
+        // We stop at n-2 because we also need a next character.
+        for(int i = 1; i <= n-2; i++) {
+
+            // Store the current character.
+            char curr = str.charAt(i);
+
+            // Store the previous character.
+            char prev = str.charAt(i-1);
+
+            // Store the next character.
+            char next = str.charAt(i+1);
+
+            // Check whether all three characters are different.
+            //
+            // curr != prev -> Current and previous are different.
+            // curr != next -> Current and next are different.
+            // prev != next -> Previous and next are different.
+            //
+            // All three conditions must be true.
+            if(curr != prev && curr != next && prev != next) {
+
+                // All three characters are distinct.
+                // Therefore, we found a good substring.
+                ans++;
+            }
+        }
+
+        // Return the total number of good substrings.
+        return ans;
+    }
+}
+class Solution {
+
+    /*
+    PROBLEM: COUNT GOOD SUBSTRINGS
+    =============================
+
+    APPROACH 2: FIXED SIZE SLIDING WINDOW + FREQUENCY ARRAYLIST
+
+
+    PROBLEM UNDERSTANDING:
+    ======================
+
     We are given a string str.
 
     A good substring is a substring of length exactly 3
@@ -25,131 +211,183 @@ public:
     "bab" -> Not good (b is repeated)
     "aba" -> Not good (a is repeated)
     "bac" -> Good (all characters are different)
+    "aca" -> Not good (a is repeated)
+    "cab" -> Good (all characters are different)
 
-    The answer depends on the actual substrings formed
-    by moving the window of size 3.
+    Answer = 2
 
 
     MAIN IDEA:
     ==========
+
     We use a fixed-size sliding window of size 3.
 
-    We maintain an unordered_map to store the frequency
-    of characters in the current window.
+    We create an ArrayList of size 26 to store the
+    frequency of all lowercase English alphabets.
 
-    If the map size becomes 3, it means the window contains
-    exactly 3 distinct characters.
+    Initially, all frequencies are zero.
 
-    Therefore, we found a good substring.
+    Index mapping:
+
+    'a' - 'a' = 0
+    'b' - 'a' = 1
+    'c' - 'a' = 2
+    ...
+    'z' - 'a' = 25
+
+    Whenever a character enters the window:
+    - Calculate its index using ch - 'a'.
+    - Increase its frequency in the ArrayList.
+
+    Whenever the window size becomes 3:
+    - Traverse the frequency ArrayList.
+    - If any character has frequency greater than 1,
+      the substring is not good.
+    - Otherwise, the substring is good.
+    - Remove the leftmost character from the window.
+    - Decrease its frequency.
+    - Move i forward.
+
+
+    WHY DO WE CHECK FREQUENCY > 1?
+    ==============================
+
+    Our window contains exactly 3 characters.
+
+    If any character has frequency greater than 1,
+    it means at least one character is repeated.
+
+    Therefore, all three characters are not distinct.
+
+    If no character has frequency greater than 1,
+    all three characters must be different.
 
 
     ALGORITHM:
     ==========
 
     STEP 1:
-    Initialize two pointers i and j at index 0.
+    Initialize i and j at index 0.
 
     STEP 2:
-    Create an unordered_map to store character frequencies.
+    Create an ArrayList of size 26 with all values initialized
+    to zero.
 
     STEP 3:
     Traverse the string using pointer j.
 
     STEP 4:
-    Add the current character str[j] to the map
-    and increase its frequency.
+    Calculate the index of the current character:
+
+    idx = str.charAt(j) - 'a'
+
+    Increase its frequency in the ArrayList.
 
     STEP 5:
-    When window size becomes 3:
-    - Check whether map size is 3.
-    - If yes, increment ans.
-    - Remove the leftmost character from the map.
-    - If its frequency becomes zero, erase it from the map.
-    - Move i forward.
+    When the window size becomes 3:
+    - Initialize flag = true.
+    - Traverse all 26 positions of the ArrayList.
+    - If any frequency is greater than 1, make flag = false.
+    - If flag is true, increment ans.
 
     STEP 6:
-    Move j forward and continue.
+    Remove the leftmost character from the window.
+    Decrease its frequency in the ArrayList.
+    Move i forward.
 
     STEP 7:
+    Move j forward and continue.
+
+    STEP 8:
     Return ans.
 
 
     TIME COMPLEXITY:
-    =================
-    O(n) average time.
+    ================
 
-    Each character is inserted and removed from the map
-    at most once. Hash map operations take O(1) average time.
+    O(26 * n)
+
+    - We traverse the string once: O(n).
+    - For every complete window, we traverse 26 positions:
+      O(26).
+
+    Total = O(26 * n).
+
+    Since 26 is constant, overall complexity is O(n).
+
 
     AUXILIARY SPACE:
-    ===============
-    O(1)
+    ================
 
-    Since the window size is fixed at 3, the map can contain
-    at most 3 distinct characters.
+    O(26) = O(1)
+
+    We use an ArrayList of fixed size 26.
     */
 
 
-    int countGoodSubstrings(string str) {
+    public int countGoodSubstrings(String str) {
 
-        int n = str.size(); // Size of the given string
-
-        // Example:
-        // str = "aababcabc"
-        //
-        // Windows of size 3:
-        // "aab"
-        // "aba"
-        // "bab"
-        // "aba"
-        // "bac"
-        // "aca"
-        // "cab"
-
-        int i = 0; // Starting index of the window
-        int j = 0; // Ending index of the window
+        int n = str.length(); // Length of the string
 
         int ans = 0; // Stores the total number of good substrings
 
-        // Stores the frequency of each character
-        // present in the current window.
-        unordered_map<char, int> m1;
+        // Create an ArrayList of size 26.
+        // Initially, the frequency of every character is zero.
+        ArrayList<Integer> arr = new ArrayList<>(Collections.nCopies(26, 0));
+
+        int i = 0; // Starting index of the window
+        int j = 0; // Ending index of the window
 
         // Traverse the string using pointer j.
         while(j < n) {
 
             // Current character entering the window.
-            char ch = str[j];
+            char ch = str.charAt(j);
 
-            // Increase the frequency of this character.
-            m1[ch]++;
+            // Convert the character into an index.
+            // Example: 'c' - 'a' = 2
+            int idx = ch - 'a';
 
-            // Check whether the current window size is 3.
-            if(j - i + 1 == 3) {
+            // Increase the frequency of the current character.
+            arr.set(idx, arr.get(idx) + 1);
 
-                // If map size is 3, it means the window
-                // contains exactly 3 distinct characters.
-                if(m1.size() == 3) {
+            // Check whether the current window size has become 3.
+            if(j-i+1 == 3) {
 
-                    // We found a good substring.
+                // Assume that the current substring is good.
+                Boolean flag = true;
+
+                // Traverse all 26 characters to check their frequencies.
+                for(int a = 0; a < 26; a++) {
+
+                    // If any character appears more than once,
+                    // the current substring is not good.
+                    if(arr.get(a) > 1) {
+
+                        flag = false;
+                    }
+                }
+
+                // If no character is repeated,
+                // all three characters are distinct.
+                if(flag == true) {
+
+                    // Increase the count of good substrings.
                     ans++;
                 }
 
-                // Store the leftmost character of the window.
-                char left = str[i];
+                // Store the leftmost character before removing it.
+                char left = str.charAt(i);
 
                 // Move the starting pointer forward.
-                // This removes the leftmost character from the window.
                 i++;
 
-                // Decrease the frequency of the removed character.
-                m1[left]--;
+                // Calculate the index of the removed character.
+                int index = left - 'a';
 
-                // If its frequency becomes zero,
-                // remove that character from the map.
-                if(m1[left] == 0) {
-                    m1.erase(left);
-                }
+                // Decrease its frequency because it is
+                // no longer part of the current window.
+                arr.set(index, arr.get(index) - 1);
             }
 
             // Move the ending pointer forward.
@@ -159,4 +397,309 @@ public:
         // Return the total number of good substrings.
         return ans;
     }
-};
+}
+class Solution {
+
+    /*
+    PROBLEM: COUNT GOOD SUBSTRINGS
+    =============================
+
+    APPROACH 3: FIXED SIZE SLIDING WINDOW + HASHMAP
+
+
+    PROBLEM UNDERSTANDING:
+    ======================
+
+    We are given a string str.
+
+    A good substring is a substring of length exactly 3
+    in which all three characters are distinct.
+
+    Distinct means all characters must be different.
+
+    Example:
+
+    str = "aababcabc"
+
+    Substrings of length 3:
+
+    "aab" -> Not good (a is repeated)
+    "aba" -> Not good (a is repeated)
+    "bab" -> Not good (b is repeated)
+    "aba" -> Not good (a is repeated)
+    "bac" -> Good (all characters are different)
+    "aca" -> Not good (a is repeated)
+    "cab" -> Good (all characters are different)
+
+    Answer = 2
+
+
+    MAIN IDEA:
+    ==========
+
+    We use a fixed-size sliding window of size 3.
+
+    We maintain a HashMap to store the frequency of
+    characters present in the current window.
+
+    Key   = Character
+    Value = Frequency of that character
+
+    Example:
+
+    Current window = "abc"
+
+    HashMap:
+
+    a -> 1
+    b -> 1
+    c -> 1
+
+    Map size = 3
+
+    Since the window contains exactly 3 distinct characters,
+    it is a good substring.
+
+    Therefore:
+
+    If map.size() == 3, increment ans.
+
+
+    WHY DO WE USE A HASHMAP?
+    ========================
+
+    A HashMap stores characters along with their frequencies.
+
+    Whenever a character enters the window:
+    - Increase its frequency in the HashMap.
+
+    Whenever a character leaves the window:
+    - Decrease its frequency.
+    - If its frequency becomes zero, remove it from the map.
+
+    IMPORTANT:
+
+    We must remove a character from the map when its frequency
+    becomes zero.
+
+    Otherwise, the map will contain characters that are no
+    longer present in the current window.
+
+    Since our window size is exactly 3, the map can contain
+    at most 3 distinct characters.
+
+
+    WHY DOES map.size() == 3 WORK?
+    ==============================
+
+    Our current window always contains exactly 3 characters.
+
+    Consider these cases:
+
+    Window = "aab"
+
+    HashMap:
+    a -> 2
+    b -> 1
+
+    map.size() = 2
+
+    Therefore, it is NOT a good substring.
+
+    --------------------------------
+
+    Window = "abc"
+
+    HashMap:
+    a -> 1
+    b -> 1
+    c -> 1
+
+    map.size() = 3
+
+    Therefore, it IS a good substring.
+
+    --------------------------------
+
+    Since the window contains exactly 3 characters,
+    having 3 distinct keys in the map guarantees that
+    all three characters are different.
+
+
+    SLIDING WINDOW VARIABLES:
+    ========================
+
+    i:
+    Starting index of the current window.
+
+    j:
+    Ending index of the current window.
+
+    ans:
+    Stores the total number of good substrings.
+
+    m1:
+    HashMap that stores the frequency of characters
+    present in the current window.
+
+
+    ALGORITHM:
+    ==========
+
+    STEP 1:
+    Calculate the length of the string.
+
+    STEP 2:
+    Initialize two pointers i and j at index 0.
+
+    STEP 3:
+    Create a HashMap to store character frequencies.
+
+    STEP 4:
+    Traverse the string using pointer j.
+
+    STEP 5:
+    Add the current character str[j] to the HashMap
+    and increase its frequency.
+
+    STEP 6:
+    Check whether the current window size becomes 3.
+
+    If the window size becomes 3:
+
+    - Check whether map.size() == 3.
+    - If yes, increment ans because all three characters
+      are distinct.
+
+    STEP 7:
+    Remove the leftmost character from the current window.
+
+    - Store str[i] in left.
+    - Move i forward.
+    - Decrease the frequency of left in the HashMap.
+    - If its frequency becomes zero, remove it from the map.
+
+    STEP 8:
+    Move j forward and continue.
+
+    STEP 9:
+    Return ans.
+
+
+    TIME COMPLEXITY:
+    ================
+
+    O(n) average time.
+
+    - We traverse the string once.
+    - Each character is inserted into the HashMap once.
+    - Each character is removed from the HashMap at most once.
+    - HashMap insertion, deletion and lookup take O(1)
+      average time.
+
+    Overall = O(n).
+
+
+    AUXILIARY SPACE:
+    ================
+
+    O(1)
+
+    Since the window size is fixed at 3,
+    the HashMap can contain at most 3 distinct characters.
+
+    Therefore, it requires constant space.
+    */
+
+
+    public int countGoodSubstrings(String str) {
+
+        int n = str.length(); // Length of the given string
+
+        int i = 0; // Starting index of the window
+        int j = 0; // Ending index of the window
+
+        int ans = 0; // Stores the total number of good substrings
+
+        // Create a HashMap to store character frequencies.
+        //
+        // Key   = Character
+        // Value = Frequency of that character
+        //
+        // Example:
+        // a -> 2
+        // b -> 1
+        HashMap<Character, Integer> m1 = new HashMap<>();
+
+
+        // Traverse the string using pointer j.
+        while(j < n) {
+
+            // Current character entering the window.
+            char ch = str.charAt(j);
+
+            // Increase the frequency of the current character.
+            //
+            // If the character is already present,
+            // its frequency will increase by 1.
+            //
+            // If the character is not present,
+            // a new entry will be created with frequency 1.
+            m1.put(ch, m1.getOrDefault(ch, 0) + 1);
+
+
+            // Check whether the current window size has become 3.
+            if(j - i + 1 == 3) {
+
+                // If map size is 3, it means there are
+                // exactly 3 distinct characters in the window.
+                //
+                // Since the window itself contains 3 characters,
+                // all three characters must be different.
+                if(m1.size() == 3) {
+
+                    // We found a good substring.
+                    // Increase the answer.
+                    ans++;
+                }
+
+
+                // Store the leftmost character of the window.
+                // This is the character that we are going to remove.
+                char left = str.charAt(i);
+
+
+                // Move the starting pointer forward.
+                //
+                // This removes the leftmost character
+                // from the current window.
+                i++;
+
+
+                // Decrease the frequency of the removed character.
+                m1.put(left, m1.get(left) - 1);
+
+
+                // Check whether the frequency of the removed
+                // character has become zero.
+                if(m1.get(left) == 0) {
+
+                    // Remove the character completely from the map.
+                    //
+                    // We do this because this character is no longer
+                    // present in the current sliding window.
+                    m1.remove(left);
+                }
+            }
+
+
+            // Move the ending pointer forward.
+            // The next character will enter the window.
+            j++;
+        }
+
+
+        // Return the total number of good substrings.
+        return ans;
+    }
+}
