@@ -1,0 +1,76 @@
+class Solution {
+public:
+    typedef long long ll;
+    int MOD = 1e9 + 7;
+
+    long long findPower(long long base, long long power) {
+        if (power == 0) {
+            return 1;
+        }
+
+        long long half = findPower(base, power / 2);
+        long long result = (half * half) % MOD;
+
+        if (power % 2 == 1) {
+            result = (result * base) % MOD;
+        }
+
+        return result;
+    }
+
+    int f(vector<int>& arr, int k) {
+        unordered_map<int, int> m1;
+
+        ll key = 0;
+        ll base = 1 + (*max_element(arr.begin(), arr.end()));
+        ll p = findPower(base, k - 1);
+
+        // value = value * base + element at j
+        // value = value - arr[i] * pow(10, k-1)
+
+        int n = arr.size();
+        int i = 0;
+        int j = 0;
+
+        while (j < n) {
+            int ele = arr[j];
+            key = (((key * base)%MOD) + ele) % MOD;
+
+            if (j - i + 1 == k) {
+                m1[key]++;
+                int left = arr[i];
+                key = ((key - (left * p)) % MOD + MOD) % MOD;
+                i++;
+            }
+            j++;
+        }
+
+        for (auto it : m1) {
+            if (it.second == 1) {
+                return k;
+            }
+        }
+        return -1;
+    }
+
+    int smallestUniqueSubarray(vector<int>& arr) {
+        int n = arr.size();
+        int start = 1;
+        int end = n;
+        int ans = n;
+
+        while (start <= end) {
+            int mid = start + (end - start) / 2;
+            int windowSize = mid;
+            int tempAns = f(arr, windowSize);
+
+            if (tempAns == -1) {
+                start = mid + 1;
+            } else {
+                ans = tempAns;
+                end = mid - 1;
+            }
+        }
+        return ans;
+    }
+};
